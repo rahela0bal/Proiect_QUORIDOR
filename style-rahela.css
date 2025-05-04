@@ -12,3 +12,11 @@ footer{
     margin: 30px;
     text-align: center;
 }
+
+.instructiuni {
+    font-size: 40px;
+    font-weight: bold;
+    color: #f5f5dc;           
+    margin-bottom: 16px;      
+    text-align: center;
+}
