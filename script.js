@@ -4,7 +4,6 @@ let numeConfirmate = false;
 
 let iconite = []; 
 let iconitaSelectata = null; 
-let mutaIconita = false; 
 
 function setup() {
     let canvas = createCanvas(1604, 815); 
@@ -41,34 +40,26 @@ function setup() {
     inima.style('font-size', '24px'); 
     inima.position(759, 145); 
     inima.style('pointer-events', 'none'); 
+    iconite.push({ div: inima, x: 759, y: 145, w: 24, h: 24 });
     
     let stea = createDiv('<i class="bi bi-star-fill"></i>'); 
     stea.style('color', '#e9a2f7'); 
     stea.style('font-size', '24px'); 
     stea.position(815, 758); 
     stea.style('pointer-events', 'none'); 
-
-  butonConfirmare = createButton('Start'); 
-  butonConfirmare.position(50, 150);
-  butonConfirmare.mousePressed(() => { 
-    numeJucator1 = inputNume1.value(); 
-    numeJucator2 = inputNume2.value(); 
-    if (numeJucator1 && numeJucator2) { 
-      numeConfirmate = true; 
-      inputNume1.hide(); 
-      inputNume2.hide(); 
-      butonConfirmare.hide(); 
+    iconite.push({ div: stea, x: 815, y: 758, w: 24, h: 24 });
 }
-});
 
 function draw() {
     background(255); 
 
-    
-    for (let ico of iconite) {
-        ico.div.position(ico.x, ico.y); 
-    }
-
+    if (numeConfirmate) {
+        fill(50);
+        textSize(24);
+        textAlign(LEFT, TOP);
+        text("Jucător 1: " + numeJucator1, 50, 10);
+        text("Jucător 2: " + numeJucator2, 50, 40);
+      }
     
     stroke('#e9a2f7');
     fill('#fad1f8'); 
@@ -86,27 +77,13 @@ function draw() {
     quad(1251, 30, 1151, 30, 1151, 730, 1251, 730);
 
     ziduri(13, 372, 42, 2);
+
+
+    for (let ico of iconite) {
+        ico.div.position(ico.x, ico.y);
+      }
 }
 
-function mousePressed() {
-    if (!mutaIconita) {  
-        for (let ico of iconite) {
-            if (mouseX > ico.x && mouseX < ico.x + ico.w && mouseY > ico.y && mouseY < ico.y + ico.h) {
-                iconitaSelectata = ico; 
-                mutaIconita = true;  
-                return;
-            }
-        }
-    } else {
-        if (iconitaSelectata) {
-            iconitaSelectata.x = mouseX - iconitaSelectata.w / 2; 
-            iconitaSelectata.y = mouseY - iconitaSelectata.h / 2;  
-            iconitaSelectata.div.position(iconitaSelectata.x, iconitaSelectata.y);  
-            iconitaSelectata = null;  
-            mutaIconita = false;  
-        }
-    }
-}
 
 function ziduri(nrLinii, startX, startY, rand) {
     stroke('#e9a2f7');
@@ -134,5 +111,4 @@ function casuteMici(nr, startX, startY, rand) {
             square(x, y, size);
         }
     }
-}
 }
