@@ -23,10 +23,7 @@ function setup() {
     quad(1251, 30, 1151, 30, 1151, 730, 1251, 730)
 
 
-    stroke('#e9a2f7');
-    fill('#f5f5dc');
-
-    quad(372, 40, 430, 40, 430, 45, 372, 45);
+    ziduri(13, 372, 42, 2);
 
   }
 
@@ -39,6 +36,21 @@ function setup() {
             let x = startX + i * (size + 5);
             let y = startY + ii * (size + 5);
                 square(x, y, size);
+        }
+    }
+}
+function ziduri(nrLinii, startX, startY, rand){
+    stroke('#e9a2f7');
+    fill('#f5f5dc');
+    let latime=51;
+    let inaltime=5;
+
+    for (let ii = 0; ii < rand; ii++) {
+        let x = startX + ii * (latime + 752); 
+
+        for (let i = 0; i < nrLinii; i++) {
+            let y = startY + i * (inaltime + 51); 
+            rect(x, y, latime, inaltime);
         }
     }
 }
