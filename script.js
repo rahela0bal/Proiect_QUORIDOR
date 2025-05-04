@@ -31,6 +31,23 @@ function setup() {
     }
   });
 
+
+let inima = createDiv('<i class="bi bi-heart-fill"></i>'); 
+  inima.style('color', '#e9a2f7'); 
+  inima.style('font-size', '24px'); 
+  inima.position(759, 145); 
+  inima.style('pointer-events', 'none'); 
+  
+  let stea = createDiv('<i class="bi bi-star-fill"></i>'); 
+  stea.style('color', '#e9a2f7'); 
+  stea.style('font-size', '24px'); 
+  stea.position(815, 758); 
+  stea.style('pointer-events', 'none'); 
+ 
+
+
+
+
   }
 
   function draw() { 
