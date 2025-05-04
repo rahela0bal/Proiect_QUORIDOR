@@ -1,6 +1,35 @@
+let inputNume1, inputNume2, butonConfirmare; 
+let numeJucator1 = "", numeJucator2 = ""; 
+let numeConfirmate = false; 
+
+
+
 function setup() {
     let canvas = createCanvas(1604, 815);
     canvas.parent("canvas-pozitie"); 
+
+  inputNume1 = createInput(); 
+  inputNume1.position(50, 50); 
+  inputNume1.size(200); 
+  inputNume1.attribute('placeholder', 'Nume Jucător 1'); 
+
+  inputNume2 = createInput(); 
+  inputNume2.position(50, 100); 
+  inputNume2.size(200); 
+  inputNume2.attribute('placeholder', 'Nume Jucător 2'); 
+
+  butonConfirmare = createButton('Start'); 
+  butonConfirmare.position(50, 150);
+  butonConfirmare.mousePressed(() => { 
+    numeJucator1 = inputNume1.value(); 
+    numeJucator2 = inputNume2.value(); 
+    if (numeJucator1 && numeJucator2) { 
+      numeConfirmate = true; 
+      inputNume1.hide(); 
+      inputNume2.hide(); 
+      butonConfirmare.hide(); 
+    }
+  });
 
   }
 
