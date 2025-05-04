@@ -28,8 +28,8 @@ function setup() {
       inputNume1.hide(); 
       inputNume2.hide(); 
       butonConfirmare.hide(); 
-    }
-  });
+}
+});
 
 
 let inima = createDiv('<i class="bi bi-heart-fill"></i>'); 
