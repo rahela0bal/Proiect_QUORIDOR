@@ -1,3 +1,7 @@
+let ziduriModificate = [];
+let zidSelectat = null;
+let mutaZid = false;
+
 let inputNume1, inputNume2, butonConfirmare; 
 let numeJucator1 = "", numeJucator2 = ""; 
 let numeConfirmate = false; 
@@ -48,7 +52,23 @@ function setup() {
     stea.position(815, 758); 
     stea.style('pointer-events', 'none'); 
     iconite.push({ div: stea, x: 815, y: 758, w: 24, h: 24 });
+
+    let nrLinii = 13;
+  let randuri = 2;
+  let startX = 372;
+  let startY = 42;
+  let latime = 51;
+  let inaltime = 5;
+
+  for (let ii = 0; ii < randuri; ii++) {
+    let x = startX + ii * (latime + 752);
+    for (let i = 0; i < nrLinii; i++) {
+      let y = startY + i * (inaltime + 51);
+      ziduriModificate.push({ x: x, y: y, latime: latime, inaltime: inaltime });
+    }
+  }
 }
+
 
 function draw() {
     background(255); 
@@ -78,27 +98,41 @@ function draw() {
 
     ziduri(13, 372, 42, 2);
 
+    for (let z of ziduriModificate) {
+        fill('#f5f5dc');
+        stroke('#e9a2f7');
+        if (z === zidSelectat && mutaZid) {
+          rect(mouseX - z.latime / 2, mouseY - z.inaltime / 2, z.latime, z.inaltime);
+        } else {
+          rect(z.x, z.y, z.latime, z.inaltime);
+        }
+      }
+
 
     for (let ico of iconite) {
         ico.div.position(ico.x, ico.y);
       }
 }
 
-
-function ziduri(nrLinii, startX, startY, rand) {
-    stroke('#e9a2f7');
-    fill('#f5f5dc');
-    let latime = 51;
-    let inaltime = 5;
-
-    for (let ii = 0; ii < rand; ii++) {
-        let x = startX + ii * (latime + 752); 
-        for (let i = 0; i < nrLinii; i++) {
-            let y = startY + i * (inaltime + 51); 
-            rect(x, y, latime, inaltime);
+function mousePressed() {
+    if (!mutaZid) {
+      for (let z of ziduriModificate) {
+        if (mouseX > z.x && mouseX < z.x + z.latime &&
+            mouseY > z.y && mouseY < z.y + z.inaltime) {
+          zidSelectat = z;
+          mutaZid = true;
+          return;
         }
+      }
+    } else {
+      if (zidSelectat) {
+        zidSelectat.x = mouseX - zidSelectat.latime / 2;
+        zidSelectat.y = mouseY - zidSelectat.inaltime / 2;
+        zidSelectat = null;
+      }
+      mutaZid = false;
     }
-}
+  }
 
 function casuteMici(nr, startX, startY, rand) {
     stroke('#e9a2f7');
