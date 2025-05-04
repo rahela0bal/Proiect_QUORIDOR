@@ -11,7 +11,18 @@ function setup() {
     square(452, 30, 700);
 
     casuteMici(11, 466, 45, 12);
+
+    stroke('#e9a2f7');
+    fill('#fad1f8');
+    arc(402, 30, 100, 50, radians(180), radians(0));
+    arc(402, 730, 100, 50, radians(0), radians(180));
+    arc(1201, 30, 100, 50, radians(180), radians(0));
+    arc(1201, 730, 100, 50, radians(0), radians(180));
+
+    quad(351, 30, 452, 30, 452, 730, 351, 730)
+    quad(1251, 30, 1151, 30, 1151, 730, 1251, 730)
     
+
   }
 
   function casuteMici(nr,startX, startY,rand){
