@@ -96,8 +96,6 @@ function draw() {
     quad(351, 30, 452, 30, 452, 730, 351, 730);
     quad(1251, 30, 1151, 30, 1151, 730, 1251, 730);
 
-    ziduri(13, 372, 42, 2);
-
     for (let z of ziduriModificate) {
         fill('#f5f5dc');
         stroke('#e9a2f7');
