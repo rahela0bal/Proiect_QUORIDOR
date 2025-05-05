@@ -10,7 +10,7 @@ let iconite = [];
 let iconitaSelectata = null; 
 
 function setup() {
-    let canvas = createCanvas(1604, 815); 
+    let canvas = createCanvas(1600, 800); 
     canvas.parent("canvas-pozitie"); 
 
    
