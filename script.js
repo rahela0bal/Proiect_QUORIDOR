@@ -1,4 +1,4 @@
-let ziduriModificate = [];
+let ziduriModificate = [];          // proiect Amalia si Rahela
 let zidSelectat = null;
 let mutaZid = false;
 
