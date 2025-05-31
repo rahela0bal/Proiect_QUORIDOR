@@ -1,81 +1,93 @@
-let ziduriModificate = [];
-let zidSelectat = null;
-let mutaZid = false;
+let peretiModificati = [];
+let pereteSelectat = null;
+let mutaPerete = false;
 
-let inputNume1, inputNume2, butonConfirmare;
-let numeJucator1 = "", numeJucator2 = "";
+let intrareNume1, intrareNume2, butonStart;
+let numeJucator1 = "";
+let numeJucator2 = "";
 let numeConfirmate = false;
 
-let iconite = [];
-let iconitaSelectata = null;
+let icoane = [];
+let icoanaSelectata = null;
 
 let spatiu = 5;
-let dim;
+let dimensiuneCelula;
 
-let offsetX = -180;
-let wallVerticalGap = 1;
+let decalajXObiecte = -180;
+let spatiuVerticalPerete = 1;
 
-let globalShiftX = 50;
+let decalajGlobalX = 50;
+
+let afiseazaPatratSetari = false;
+let butonComutarePatrat;
 
 function setup() {
-    let canvas = createCanvas(1800, 800);
-    canvas.parent("canvas-pozitie");
+    let panza = createCanvas(1800, 800);
+    panza.parent("canvas-pozitie");
 
-    inputNume1 = createInput();
-    inputNume1.position(50 + globalShiftX, 50);
-    inputNume1.size(200);
-    inputNume1.attribute('placeholder', 'Nume Jucător 1');
+    intrareNume1 = createInput();
+    intrareNume1.position(50 + decalajGlobalX, 50);
+    intrareNume1.size(200);
+    intrareNume1.attribute('placeholder', 'Nume Jucător 1');
 
-    inputNume2 = createInput();
-    inputNume2.position(50 + globalShiftX, 100);
-    inputNume2.size(200);
-    inputNume2.attribute('placeholder', 'Nume Jucător 2');
+    intrareNume2 = createInput();
+    intrareNume2.position(50 + decalajGlobalX, 100);
+    intrareNume2.size(200);
+    intrareNume2.attribute('placeholder', 'Nume Jucător 2');
 
-    butonConfirmare = createButton('Start');
-    butonConfirmare.position(50 + globalShiftX, 150);
-    butonConfirmare.mousePressed(() => {
-        numeJucator1 = inputNume1.value();
-        numeJucator2 = inputNume2.value();
+    butonStart = createButton('Start');
+    butonStart.position(50 + decalajGlobalX, 150);
+    butonStart.mousePressed(() => {
+        numeJucator1 = intrareNume1.value();
+        numeJucator2 = intrareNume2.value();
         if (numeJucator1 && numeJucator2) {
             numeConfirmate = true;
-            inputNume1.hide();
-            inputNume2.hide();
-            butonConfirmare.hide();
+            intrareNume1.hide();
+            intrareNume2.hide();
+            butonStart.hide();
         }
+    });
+
+    butonComutarePatrat = createButton(''); 
+    butonComutarePatrat.html('<i class="bi bi-gear-fill"></i>'); 
+    butonComutarePatrat.style('font-size', '45px'); 
+    butonComutarePatrat.position(width - 250, 30);
+    butonComutarePatrat.mousePressed(() => {
+        afiseazaPatratSetari = !afiseazaPatratSetari;
     });
 
     let inima = createDiv('<i class="bi bi-heart-fill"></i>');
     inima.style('color', '#e9a2f7');
     inima.style('font-size', '24px');
-    inima.position(759 + globalShiftX, 145);
+    inima.position(759 + decalajGlobalX, 145);
     inima.style('pointer-events', 'none');
-    iconite.push({ div: inima, x: 759 + globalShiftX, y: 145, w: 24, h: 24 });
+    icoane.push({ div: inima, x: 759 + decalajGlobalX, y: 145, w: 24, h: 24 });
 
     let stea = createDiv('<i class="bi bi-star-fill"></i>');
     stea.style('color', '#e9a2f7');
     stea.style('font-size', '24px');
-    stea.position(815 + globalShiftX, 758);
+    stea.position(815 + decalajGlobalX, 758);
     stea.style('pointer-events', 'none');
-    iconite.push({ div: stea, x: 815 + globalShiftX, y: 758, w: 24, h: 24 });
+    icoane.push({ div: stea, x: 815 + decalajGlobalX, y: 758, w: 24, h: 24 });
 
-    dim = (700 - 2 * spatiu - 8 * spatiu) / 9;
+    dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
 
-    let nrLinii = 10;
+    let numarLinii = 10;
     let randuri = 2;
-    let startXZiduri = (452 + offsetX + globalShiftX) + spatiu;
-    let latime = 2 * dim + spatiu;
+    let startXPereti = (452 + decalajXObiecte + decalajGlobalX) + spatiu;
+    let latime = 2 * dimensiuneCelula + spatiu;
     let inaltime = 5;
 
-    let totalWallBlockHeight = (nrLinii - 1) * (dim + wallVerticalGap) + inaltime;
-    let quadHeight = 730 - 30; 
-    let remainingVerticalSpace = quadHeight - totalWallBlockHeight;
-    let startYWalls = 30 + (remainingVerticalSpace / 2); 
+    let inaltimeTotalaBlocPerete = (numarLinii - 1) * (dimensiuneCelula + spatiuVerticalPerete) + inaltime;
+    let inaltimePatrat = 730 - 30; 
+    let spatiuVerticalRamas = inaltimePatrat - inaltimeTotalaBlocPerete;
+    let startYPereti = 30 + (spatiuVerticalRamas / 2); 
 
     for (let ii = 0; ii < randuri; ii++) {
-        let x = startXZiduri + ii * (latime + 752);
-        for (let i = 0; i < nrLinii; i++) {
-            let y = startYWalls + i * (dim + wallVerticalGap);
-            ziduriModificate.push({ x: x, y: y, latime: latime, inaltime: inaltime });
+        let x = startXPereti + ii * (latime + 752);
+        for (let i = 0; i < numarLinii; i++) {
+            let y = startYPereti + i * (dimensiuneCelula + spatiuVerticalPerete);
+            peretiModificati.push({ x: x, y: y, latime: latime, inaltime: inaltime });
         }
     }
 }
@@ -87,65 +99,68 @@ function draw() {
         fill(50);
         textSize(24);
         textAlign(LEFT, TOP);
-        text("Jucător 1: " + numeJucator1, 50 + globalShiftX, 10);
-        text("Jucător 2: " + numeJucator2, 50 + globalShiftX, 40);
+        text("Jucător 1: " + numeJucator1, 50 + decalajGlobalX, 10);
+        text("Jucător 2: " + numeJucator2, 50 + decalajGlobalX, 40);
     }
 
     stroke('#e9a2f7');
     fill('#fad1f8');
 
-    square(452 + globalShiftX, 30, 700);
-    square(width - 435 + globalShiftX, 30, 150); 
+    square(452 + decalajGlobalX, 30, 700);
+    
+    if (afiseazaPatratSetari) {
+        square(width - 435 + decalajGlobalX, 30, 150); 
+    }
 
-    dim = (700 - 2 * spatiu - 8 * spatiu) / 9;
-    let startXCasuteMici = (452 + globalShiftX) + spatiu;
+    dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
+    let startXCasuteMici = (452 + decalajGlobalX) + spatiu;
     let startYCasuteMici = 30 + spatiu;
 
-    casuteMici(8, startXCasuteMici, startYCasuteMici, 9, dim, spatiu);
+    deseneazaCasuteMici(8, startXCasuteMici, startYCasuteMici, 9, dimensiuneCelula, spatiu);
 
     stroke('#e9a2f7');
     fill('#fad1f8');
 
-    quad(250 + globalShiftX, 30, 452 + globalShiftX, 30, 452 + globalShiftX, 730, 250 + globalShiftX, 730);
+    quad(250 + decalajGlobalX, 30, 452 + decalajGlobalX, 30, 452 + decalajGlobalX, 730, 250 + decalajGlobalX, 730);
 
-    quad(1151 + globalShiftX, 30, 1351 + globalShiftX, 30, 1351 + globalShiftX, 730, 1151 + globalShiftX, 730);
+    quad(1151 + decalajGlobalX, 30, 1351 + decalajGlobalX, 30, 1351 + decalajGlobalX, 730, 1151 + decalajGlobalX, 730);
 
-    for (let z of ziduriModificate) {
+    for (let z of peretiModificati) {
         fill('#f5f5dc');
         stroke('#e9a2f7');
-        if (z === zidSelectat && mutaZid) {
+        if (z === pereteSelectat && mutaPerete) {
             rect(mouseX - z.latime / 2, mouseY - z.inaltime / 2, z.latime, z.inaltime);
         } else {
             rect(z.x, z.y, z.latime, z.inaltime);
         }
     }
 
-    for (let ico of iconite) {
+    for (let ico of icoane) {
         ico.div.position(ico.x, ico.y);
     }
 }
 
 function mousePressed() {
-    if (!mutaZid) {
-        for (let z of ziduriModificate) {
+    if (!mutaPerete) {
+        for (let z of peretiModificati) {
             if (mouseX > z.x && mouseX < z.x + z.latime &&
                 mouseY > z.y && mouseY < z.y + z.inaltime) {
-                zidSelectat = z;
-                mutaZid = true;
+                pereteSelectat = z;
+                mutaPerete = true;
                 return;
             }
         }
     } else {
-        if (zidSelectat) {
-            zidSelectat.x = mouseX - zidSelectat.latime / 2;
-            zidSelectat.y = mouseY - zidSelectat.inaltime / 2;
-            zidSelectat = null;
+        if (pereteSelectat) {
+            pereteSelectat.x = mouseX - pereteSelectat.latime / 2;
+            pereteSelectat.y = mouseY - pereteSelectat.inaltime / 2;
+            pereteSelectat = null;
         }
-        mutaZid = false;
+        mutaPerete = false;
     }
 }
 
-function casuteMici(nr, startX, startY, rand, dim, spatiu) {
+function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
     stroke('#e9a2f7');
     fill('#f5f5dc'); 
     for (let ii = 0; ii < rand; ii++) {
