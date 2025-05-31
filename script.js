@@ -84,7 +84,13 @@ function draw() {
     stroke('#e9a2f7');
     fill('#fad1f8'); 
     square(452, 30, 700);
-    casuteMici(9, 466, 45, 9);
+
+    let spatiu = 5;
+    let dim = (700 - (8 * spatiu)) / 9; 
+    let startX = 452;
+    let startY = 30;
+    
+    casuteMici(8, startX, startY, 9, dim, spatiu);
 
     stroke('#e9a2f7');
     fill('#fad1f8');
@@ -132,15 +138,14 @@ function mousePressed() {
     }
   }
 
-function casuteMici(nr, startX, startY, rand) {
+  function casuteMici(nr, startX, startY, rand, dim, spatiu) {
     stroke('#e9a2f7');
     fill('#f5f5dc');
-    let size = 51;
     for (let ii = 0; ii < rand; ii++) {
-        for (let i = 0; i <= nr; i++) {
-            let x = startX + i * (size + 5);
-            let y = startY + ii * (size + 5);
-            square(x, y, size);
-        }
+      for (let i = 0; i <= nr; i++) {
+        let x = startX + i * (dim + spatiu);
+        let y = startY + ii * (dim + spatiu);
+        square(x, y, dim);
+      }
     }
-}
+  }
