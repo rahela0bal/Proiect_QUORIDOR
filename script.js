@@ -144,3 +144,4 @@ function casuteMici(nr, startX, startY, rand) {
         }
     }
 }
+ 
