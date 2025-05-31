@@ -86,10 +86,10 @@ function draw() {
     square(452, 30, 700);
 
     let spatiu = 5;
-    let dim = (700 - (8 * spatiu)) / 9; 
-    let startX = 452;
-    let startY = 30;
-    
+    let dim = (700 - 2 * spatiu - 8 * spatiu) / 9; 
+    let startX = 452 + spatiu;
+    let startY = 30 + spatiu;
+  
     casuteMici(8, startX, startY, 9, dim, spatiu);
 
     stroke('#e9a2f7');
