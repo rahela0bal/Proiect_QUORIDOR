@@ -18,7 +18,7 @@ let wallVerticalGap = 1;
 let globalShiftX = 50;
 
 function setup() {
-    let canvas = createCanvas(1600, 800);
+    let canvas = createCanvas(1800, 800);
     canvas.parent("canvas-pozitie");
 
     inputNume1 = createInput();
@@ -95,8 +95,7 @@ function draw() {
     fill('#fad1f8');
 
     square(452 + globalShiftX, 30, 700);
-
-    square(width - 250, 30, 240); 
+    square(width - 435 + globalShiftX, 30, 150); 
 
     dim = (700 - 2 * spatiu - 8 * spatiu) / 9;
     let startXCasuteMici = (452 + globalShiftX) + spatiu;
@@ -157,4 +156,3 @@ function casuteMici(nr, startX, startY, rand, dim, spatiu) {
         }
     }
 }
-
