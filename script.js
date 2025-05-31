@@ -84,7 +84,7 @@ function draw() {
     stroke('#e9a2f7');
     fill('#fad1f8'); 
     square(452, 30, 700);
-    casuteMici(11, 466, 45, 12);
+    casuteMici(9, 466, 45, 9);
 
     stroke('#e9a2f7');
     fill('#fad1f8');
