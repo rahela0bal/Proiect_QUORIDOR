@@ -8,6 +8,7 @@ let numeJucator2 = "";
 let numeConfirmate = false;
 
 let jucatorActiv = 1;
+let primaMiscareFacuta = false; // Adaugă o variabilă pentru a urmări prima mișcare
 
 let icoane = [];
 let icoanaSelectata = null;
@@ -186,7 +187,7 @@ function setup() {
 
         for (let ico of icoane) {
             ico.div.style('color', culoareIcoane);
-            ico.div.style('font-size', '36px'); 
+            ico.div.style('font-size', '36px');
         }
     });
 
@@ -238,7 +239,7 @@ function setup() {
 
         for (let ico of icoane) {
             ico.div.style('color', culoareIcoane);
-            ico.div.style('font-size', '36px'); // Asigurăm dimensiunea la schimbarea culorii
+            ico.div.style('font-size', '36px');
         }
     });
 
@@ -288,26 +289,24 @@ function setup() {
 
         for (let ico of icoane) {
             ico.div.style('color', culoareIcoane);
-            ico.div.style('font-size', '36px'); // Asigurăm dimensiunea la schimbarea culorii
+            ico.div.style('font-size', '36px');
         }
     });
 
     dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
 
-    // Inițializarea icoanelor cu dimensiuni mai mari și poziție care va fi actualizată de deseneazaPioni
     let inima = createDiv('<i class="bi bi-heart-fill"></i>');
     inima.style('color', culoareIcoane);
-    inima.style('font-size', '36px'); // Dimensiunea mărită
+    inima.style('font-size', '36px');
     inima.style('pointer-events', 'none');
-    icoane.push({ div: inima, linie: 1, coloana: 4, w: 36, h: 36 }); // Actualizăm w și h
+    icoane.push({ div: inima, linie: 1, coloana: 4, w: 36, h: 36 });
 
     let stea = createDiv('<i class="bi bi-star-fill"></i>');
     stea.style('color', culoareIcoane);
-    stea.style('font-size', '36px'); // Dimensiunea mărită
+    stea.style('font-size', '36px');
     stea.style('pointer-events', 'none');
-    icoane.push({ div: stea, linie: 9, coloana: 4, w: 36, h: 36 }); // Actualizăm w și h
+    icoane.push({ div: stea, linie: 9, coloana: 4, w: 36, h: 36 });
 
-    // Setăm pionii să facă referire la elementele din array-ul icoane
     pion1 = icoane[0];
     pion2 = icoane[1];
 
@@ -326,7 +325,6 @@ function setup() {
         let x = startXPereti + ii * (latimeInitiala + 752);
         for (let i = 0; i < numarLinii; i++) {
             let y = startYPereti + i * (dimensiuneCelula + spatiuVerticalPerete);
-            // Adăugăm o proprietate 'orientare' pentru ziduri, implicit 'orizontal'
             peretiModificati.push({ x: x, y: y, latime: latimeInitiala, inaltime: inaltimeInitiala, orientare: 'orizontal' });
         }
     }
@@ -398,23 +396,25 @@ function mousePressed() {
         return;
     }
 
-    if (!mutaPerete) {
-        for (let z of peretiModificati) {
-            if (mouseX > z.x && mouseX < z.x + z.latime &&
-                mouseY > z.y && mouseY < z.y + z.inaltime) {
-                pereteSelectat = z;
-                mutaPerete = true;
-                return;
+    // Permite mutarea zidurilor doar după ce prima mișcare a pionului a fost făcută
+    if (numeConfirmate && primaMiscareFacuta) {
+        if (!mutaPerete) {
+            for (let z of peretiModificati) {
+                if (mouseX > z.x && mouseX < z.x + z.latime &&
+                    mouseY > z.y && mouseY < z.y + z.inaltime) {
+                    pereteSelectat = z;
+                    mutaPerete = true;
+                    return;
+                }
             }
+        } else {
+            if (pereteSelectat) {
+                pereteSelectat.x = mouseX - pereteSelectat.latime / 2;
+                pereteSelectat.y = mouseY - pereteSelectat.inaltime / 2;
+                pereteSelectat = null;
+            }
+            mutaPerete = false;
         }
-    } else {
-        if (pereteSelectat) {
-            // Când eliberăm click-ul, actualizăm poziția zidului selectat
-            pereteSelectat.x = mouseX - pereteSelectat.latime / 2;
-            pereteSelectat.y = mouseY - pereteSelectat.inaltime / 2;
-            pereteSelectat = null; // Deselectăm zidul
-        }
-        mutaPerete = false; // Oprim modul de mutare
     }
 }
 
@@ -447,30 +447,57 @@ function deseneazaPioni() {
 
 function keyPressed() {
     if (numeConfirmate) {
-        if (jucatorActiv === 1) {
-            if (key === 'w' && pion1.linie > 0) { pion1.linie--; schimbaRandul(); }
-            if (key === 's' && pion1.linie < 8) { pion1.linie++; schimbaRandul(); }
-            if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; schimbaRandul(); }
-            if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; schimbaRandul(); }
-        } else if (jucatorActiv === 2) {
-            if (keyCode === UP_ARROW && pion2.linie > 0) { pion2.linie--; schimbaRandul(); }
-            if (keyCode === DOWN_ARROW && pion2.linie < 8) { pion2.linie++; schimbaRandul(); }
-            if (keyCode === LEFT_ARROW && pion2.coloana > 0) { pion2.coloana--; schimbaRandul(); }
-            if (keyCode === RIGHT_ARROW && pion2.coloana < 8) { pion2.coloana++; schimbaRandul(); }
+        // Logica pentru mișcarea pionilor
+        if (!primaMiscareFacuta) {
+            if (jucatorActiv === 1) {
+                let moved = false;
+                // Salvează poziția inițială pentru a verifica dacă pionul s-a mișcat
+                let initialLinie = pion1.linie;
+                let initialColoana = pion1.coloana;
+
+                if (key === 'w' && pion1.linie > 0) { pion1.linie--; }
+                else if (key === 's' && pion1.linie < 8) { pion1.linie++; }
+                else if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; }
+                else if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; }
+
+                // Verifică dacă pionul s-a mișcat efectiv
+                if (pion1.linie !== initialLinie || pion1.coloana !== initialColoana) {
+                    moved = true;
+                }
+
+                if (moved) {
+                    primaMiscareFacuta = true; // Setează că prima mișcare a fost făcută
+                    schimbaRandul(); // Schimbă rândul după prima mișcare
+                }
+            }
+        } else {
+            // După prima mișcare, jocul se desfășoară normal
+            if (jucatorActiv === 1) {
+                if (key === 'w' && pion1.linie > 0) { pion1.linie--; schimbaRandul(); }
+                if (key === 's' && pion1.linie < 8) { pion1.linie++; schimbaRandul(); }
+                if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; schimbaRandul(); }
+                if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; schimbaRandul(); }
+            } else if (jucatorActiv === 2) {
+                if (keyCode === UP_ARROW && pion2.linie > 0) { pion2.linie--; schimbaRandul(); }
+                if (keyCode === DOWN_ARROW && pion2.linie < 8) { pion2.linie++; schimbaRandul(); }
+                if (keyCode === LEFT_ARROW && pion2.coloana > 0) { pion2.coloana--; schimbaRandul(); }
+                if (keyCode === RIGHT_ARROW && pion2.coloana < 8) { pion2.coloana++; schimbaRandul(); }
+            }
         }
     }
 
-    // Rotirea zidurilor
-    if (pereteSelectat && (key === 'v' || key === 'o')) {
-        let tempLatime = pereteSelectat.latime;
-        pereteSelectat.latime = pereteSelectat.inaltime;
-        pereteSelectat.inaltime = tempLatime;
+    // Permite rotirea zidurilor doar după ce prima mișcare a pionului a fost făcută
+    if (numeConfirmate && primaMiscareFacuta) {
+        if (pereteSelectat && (key === 'v' || key === 'o')) {
+            let tempLatime = pereteSelectat.latime;
+            pereteSelectat.latime = pereteSelectat.inaltime;
+            pereteSelectat.inaltime = tempLatime;
 
-        // Schimbă orientarea pentru a ști cum să o rotești ulterior
-        if (pereteSelectat.orientare === 'orizontal') {
-            pereteSelectat.orientare = 'vertical';
-        } else {
-            pereteSelectat.orientare = 'orizontal';
+            if (pereteSelectat.orientare === 'orizontal') {
+                pereteSelectat.orientare = 'vertical';
+            } else {
+                pereteSelectat.orientare = 'orizontal';
+            }
         }
     }
 }
