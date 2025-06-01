@@ -8,7 +8,7 @@ let numeJucator2 = "";
 let numeConfirmate = false;
 
 let jucatorActiv = 1;
-let primaMiscareFacuta = false; // Adaugă o variabilă pentru a urmări prima mișcare
+let primaMiscareFacuta = false;
 
 let icoane = [];
 let icoanaSelectata = null;
@@ -50,6 +50,8 @@ let culoareTextAlegeCuloare;
 
 let pion1;
 let pion2;
+
+let pozitiiPosibileZiduri = [];
 
 function setup() {
     let panza = createCanvas(1800, 800);
@@ -328,6 +330,8 @@ function setup() {
             peretiModificati.push({ x: x, y: y, latime: latimeInitiala, inaltime: inaltimeInitiala, orientare: 'orizontal' });
         }
     }
+
+    initializeazaPozitiiPosibileZiduri();
 }
 
 function draw() {
@@ -349,7 +353,6 @@ function draw() {
     if (afiseazaPatratSetari) {
         let patratSetariX = width - 435 + decalajGlobalX;
         let patratSetariY = 30;
-        let patratSetariDim = 150;
 
         textAlegeCuloare.position(patratSetariX + 10, patratSetariY + 10);
         patratCuloareMaro.position(patratSetariX + 10, patratSetariY + 40);
@@ -388,7 +391,7 @@ function mousePressed() {
         return;
     }
     if (afiseazaPatratSetari && mouseX > patratCuloareNegru.position().x && mouseX < patratCuloareNegru.position().x + patratCuloareNegru.width &&
-        mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.height) {
+        mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.position().height) {
         return;
     }
     if (afiseazaPatratSetari && mouseX > patratCuloareRoz.position().x && mouseX < patratCuloareRoz.position().x + patratCuloareRoz.width &&
@@ -396,7 +399,6 @@ function mousePressed() {
         return;
     }
 
-    // Permite mutarea zidurilor doar după ce prima mișcare a pionului a fost făcută
     if (numeConfirmate && primaMiscareFacuta) {
         if (!mutaPerete) {
             for (let z of peretiModificati) {
@@ -407,14 +409,24 @@ function mousePressed() {
                     return;
                 }
             }
-        } else {
-            if (pereteSelectat) {
-                pereteSelectat.x = mouseX - pereteSelectat.latime / 2;
-                pereteSelectat.y = mouseY - pereteSelectat.inaltime / 2;
-                pereteSelectat = null;
-            }
-            mutaPerete = false;
         }
+    }
+}
+
+function mouseReleased() {
+    if (numeConfirmate && primaMiscareFacuta && mutaPerete && pereteSelectat) {
+        let celMaiApropiatPunct = gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, pereteSelectat.orientare);
+
+        if (celMaiApropiatPunct) {
+            pereteSelectat.x = celMaiApropiatPunct.x;
+            pereteSelectat.y = celMaiApropiatPunct.y;
+            pereteSelectat.latime = celMaiApropiatPunct.latime;
+            pereteSelectat.inaltime = celMaiApropiatPunct.inaltime;
+            pereteSelectat.orientare = celMaiApropiatPunct.orientare;
+            schimbaRandul();
+        }
+        pereteSelectat = null;
+        mutaPerete = false;
     }
 }
 
@@ -447,11 +459,9 @@ function deseneazaPioni() {
 
 function keyPressed() {
     if (numeConfirmate) {
-        // Logica pentru mișcarea pionilor
         if (!primaMiscareFacuta) {
             if (jucatorActiv === 1) {
                 let moved = false;
-                // Salvează poziția inițială pentru a verifica dacă pionul s-a mișcat
                 let initialLinie = pion1.linie;
                 let initialColoana = pion1.coloana;
 
@@ -460,18 +470,16 @@ function keyPressed() {
                 else if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; }
                 else if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; }
 
-                // Verifică dacă pionul s-a mișcat efectiv
                 if (pion1.linie !== initialLinie || pion1.coloana !== initialColoana) {
                     moved = true;
                 }
 
                 if (moved) {
-                    primaMiscareFacuta = true; // Setează că prima mișcare a fost făcută
-                    schimbaRandul(); // Schimbă rândul după prima mișcare
+                    primaMiscareFacuta = true;
+                    schimbaRandul();
                 }
             }
         } else {
-            // După prima mișcare, jocul se desfășoară normal
             if (jucatorActiv === 1) {
                 if (key === 'w' && pion1.linie > 0) { pion1.linie--; schimbaRandul(); }
                 if (key === 's' && pion1.linie < 8) { pion1.linie++; schimbaRandul(); }
@@ -486,7 +494,6 @@ function keyPressed() {
         }
     }
 
-    // Permite rotirea zidurilor doar după ce prima mișcare a pionului a fost făcută
     if (numeConfirmate && primaMiscareFacuta) {
         if (pereteSelectat && (key === 'v' || key === 'o')) {
             let tempLatime = pereteSelectat.latime;
@@ -504,4 +511,55 @@ function keyPressed() {
 
 function schimbaRandul() {
     jucatorActiv = jucatorActiv === 1 ? 2 : 1;
+}
+
+function initializeazaPozitiiPosibileZiduri() {
+    pozitiiPosibileZiduri = [];
+    let startXTabla = 452 + decalajGlobalX;
+    let startYTabla = 30;
+
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            let x = startXTabla + spatiu + c * (dimensiuneCelula + spatiu);
+            let y = startYTabla + spatiu + (r + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
+            let latime = 2 * dimensiuneCelula + spatiu;
+            let inaltime = 5;
+            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'orizontal', tip: 'zid' });
+        }
+    }
+
+    for (let r = 0; r < 8; r++) {
+        for (let c = 0; c < 8; c++) {
+            let x = startXTabla + spatiu + (c + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
+            let y = startYTabla + spatiu + r * (dimensiuneCelula + spatiu);
+            let latime = 5;
+            let inaltime = 2 * dimensiuneCelula + spatiu;
+            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'vertical', tip: 'zid' });
+        }
+    }
+}
+
+function gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, orientareCurenta) {
+    let celMaiApropiat = null;
+    let distantaMinima = Infinity;
+    const toleranta = 50;
+
+    for (let pos of pozitiiPosibileZiduri) {
+        if (pos.orientare === orientareCurenta) {
+            let centerX = pos.x + pos.latime / 2;
+            let centerY = pos.y + pos.inaltime / 2;
+
+            let d = dist(mouseX, mouseY, centerX, centerY);
+
+            if (d < distantaMinima) {
+                distantaMinima = d;
+                celMaiApropiat = pos;
+            }
+        }
+    }
+
+    if (distantaMinima > toleranta) {
+        return null;
+    }
+    return celMaiApropiat;
 }
