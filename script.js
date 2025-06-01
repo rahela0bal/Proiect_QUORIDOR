@@ -67,7 +67,7 @@ function setup() {
     culoareParagraphText = '#fdfdd7';
     culoareButonStartBackground = '#8b5cf6';
     culoareButonStartText = '#ffffff';
-    culoareTextAlegeCuloare = '#333';
+    culoareTextAlegeCuloare = '#e9a2f7';
 
     document.querySelector('.titlul').style.color = culoareTitlu;
     document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
@@ -186,7 +186,6 @@ function setup() {
 
         textAlegeCuloare.style('color', culoareTextAlegeCuloare);
 
-
         for (let ico of icoane) {
             ico.div.style('color', culoareIcoane);
         }
@@ -199,6 +198,51 @@ function setup() {
     patratCuloareRoz.style('background-color', culoarePatratRozFundal);
     patratCuloareRoz.style('border', `2px solid ${culoarePatratRozContur}`);
     patratCuloareRoz.hide();
+    patratCuloareRoz.mousePressed(() => {
+        culoareTablaFundal = '#fad1f8';
+        culoareTablaContur = '#e9a2f7';
+        culoareIcoane = '#e9a2f7';
+        culoarePatratRozFundal = '#ffc0cb';
+        culoarePatratRozContur = '#e9a2f7';
+        culoareGardContur = '#e9a2f7';
+
+        culoareTitlu = '#e9a2f7';
+        culoareInputBorder = '#a78bfa';
+        culoareInputFocusRing = '#8b5cf6';
+        culoareInputText = '#374151';
+        culoareSetariIcon = '#9333ea';
+        culoareFooterBackground = '#fad1f8';
+        culoareInstructiuniText = '#f5f5dc';
+        culoareParagraphText = '#fdfdd7';
+        culoareButonStartBackground = '#8b5cf6';
+        culoareButonStartText = '#ffffff';
+        culoareTextAlegeCuloare = '#e9a2f7'; // Asigură că textul devine roz
+
+        document.querySelector('.titlul').style.color = culoareTitlu;
+        document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
+        document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
+        document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
+
+        intrareNume1.elt.style.borderColor = culoareInputBorder;
+        intrareNume1.elt.style.color = culoareInputText;
+        intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        intrareNume2.elt.style.borderColor = culoareInputBorder;
+        intrareNume2.elt.style.color = culoareInputText;
+        intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
+
+        butonStart.elt.style.backgroundColor = culoareButonStartBackground;
+        butonStart.elt.style.color = culoareButonStartText;
+
+        textAlegeCuloare.style('color', culoareTextAlegeCuloare);
+
+        for (let ico of icoane) {
+            ico.div.style('color', culoareIcoane);
+        }
+    });
+
 
     patratCuloareNegru = createDiv('');
     patratCuloareNegru.style('width', '25px');
@@ -207,22 +251,22 @@ function setup() {
     patratCuloareNegru.style('border', '2px solid #333');
     patratCuloareNegru.hide();
     patratCuloareNegru.mousePressed(() => {
-        culoareTablaFundal = '#FFFFFF'; // White
-        culoareTablaContur = '#000000'; // Black
-        culoareIcoane = '#000000'; // Black
-        culoareGardContur = '#000000'; // Black
+        culoareTablaFundal = '#FFFFFF';
+        culoareTablaContur = '#000000';
+        culoareIcoane = '#000000';
+        culoareGardContur = '#000000';
 
-        culoareTitlu = '#000000'; // Black
-        culoareInputBorder = '#333333'; // Dark Gray
-        culoareInputFocusRing = '#666666'; // Medium Gray
-        culoareInputText = '#000000'; // Black
-        culoareSetariIcon = '#000000'; // Black
-        culoareFooterBackground = '#EEEEEE'; // Light Gray
-        culoareInstructiuniText = '#333333'; // Dark Gray
-        culoareParagraphText = '#333333'; // Dark Gray
-        culoareButonStartBackground = '#333333'; // Dark Gray for Start button
-        culoareButonStartText = '#FFFFFF'; // White for Start button text
-        culoareTextAlegeCuloare = '#000000'; // Black for "Alegeți Culoare" text
+        culoareTitlu = '#000000';
+        culoareInputBorder = '#333333';
+        culoareInputFocusRing = '#666666';
+        culoareInputText = '#000000';
+        culoareSetariIcon = '#000000';
+        culoareFooterBackground = '#EEEEEE';
+        culoareInstructiuniText = '#333333';
+        culoareParagraphText = '#333333';
+        culoareButonStartBackground = '#333333';
+        culoareButonStartText = '#FFFFFF';
+        culoareTextAlegeCuloare = '#000000';
 
         document.querySelector('.titlul').style.color = culoareTitlu;
         document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
@@ -346,6 +390,10 @@ function mousePressed() {
     }
     if (afiseazaPatratSetari && mouseX > patratCuloareNegru.position().x && mouseX < patratCuloareNegru.position().x + patratCuloareNegru.width &&
         mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.height) {
+        return;
+    }
+    if (afiseazaPatratSetari && mouseX > patratCuloareRoz.position().x && mouseX < patratCuloareRoz.position().x + patratCuloareRoz.width &&
+        mouseY > patratCuloareRoz.position().y && mouseY < patratCuloareRoz.position().y + patratCuloareRoz.height) {
         return;
     }
 
