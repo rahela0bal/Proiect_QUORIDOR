@@ -206,6 +206,48 @@ function setup() {
     patratCuloareNegru.style('background-color', 'black');
     patratCuloareNegru.style('border', '2px solid #333');
     patratCuloareNegru.hide();
+    patratCuloareNegru.mousePressed(() => {
+        culoareTablaFundal = '#FFFFFF'; // White
+        culoareTablaContur = '#000000'; // Black
+        culoareIcoane = '#000000'; // Black
+        culoareGardContur = '#000000'; // Black
+
+        culoareTitlu = '#000000'; // Black
+        culoareInputBorder = '#333333'; // Dark Gray
+        culoareInputFocusRing = '#666666'; // Medium Gray
+        culoareInputText = '#000000'; // Black
+        culoareSetariIcon = '#000000'; // Black
+        culoareFooterBackground = '#EEEEEE'; // Light Gray
+        culoareInstructiuniText = '#333333'; // Dark Gray
+        culoareParagraphText = '#333333'; // Dark Gray
+        culoareButonStartBackground = '#333333'; // Dark Gray for Start button
+        culoareButonStartText = '#FFFFFF'; // White for Start button text
+        culoareTextAlegeCuloare = '#000000'; // Black for "Alegeți Culoare" text
+
+        document.querySelector('.titlul').style.color = culoareTitlu;
+        document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
+        document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
+        document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
+
+        intrareNume1.elt.style.borderColor = culoareInputBorder;
+        intrareNume1.elt.style.color = culoareInputText;
+        intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        intrareNume2.elt.style.borderColor = culoareInputBorder;
+        intrareNume2.elt.style.color = culoareInputText;
+        intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
+
+        butonStart.elt.style.backgroundColor = culoareButonStartBackground;
+        butonStart.elt.style.color = culoareButonStartText;
+
+        textAlegeCuloare.style('color', culoareTextAlegeCuloare);
+
+        for (let ico of icoane) {
+            ico.div.style('color', culoareIcoane);
+        }
+    });
 
 
     let inima = createDiv('<i class="bi bi-heart-fill"></i>');
@@ -302,6 +344,10 @@ function mousePressed() {
         mouseY > patratCuloareMaro.position().y && mouseY < patratCuloareMaro.position().y + patratCuloareMaro.height) {
         return;
     }
+    if (afiseazaPatratSetari && mouseX > patratCuloareNegru.position().x && mouseX < patratCuloareNegru.position().x + patratCuloareNegru.width &&
+        mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.height) {
+        return;
+    }
 
     if (!mutaPerete) {
         for (let z of peretiModificati) {
@@ -333,3 +379,4 @@ function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
         }
     }
 }
+
