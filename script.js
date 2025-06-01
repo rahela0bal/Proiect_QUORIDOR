@@ -56,8 +56,12 @@ let pozitiiPosibileZiduri = [];
 let ziduriJucator1 = 10;
 let ziduriJucator2 = 10;
 
-// Variabilă nouă pentru a stoca indexul zidului selectat în array-ul peretiModificati
 let pereteSelectatIndex = -1;
+
+let jucator2AIActiv = false;
+let butonActivareAI;
+
+let ultimaActiuneAI = 'zid';
 
 function setup() {
     let panza = createCanvas(1800, 800);
@@ -115,11 +119,32 @@ function setup() {
             intrareNume1.hide();
             intrareNume2.hide();
             butonStart.hide();
+            butonActivareAI.show();
         }
     });
     butonStart.elt.classList.add('font-bold', 'py-2', 'px-4', 'rounded', 'shadow-md');
     butonStart.elt.style.backgroundColor = culoareButonStartBackground;
     butonStart.elt.style.color = culoareButonStartText;
+
+    butonActivareAI = createButton('Activează AI Jucător 2');
+    butonActivareAI.position(50 + decalajGlobalX, 270);
+    butonActivareAI.mousePressed(() => {
+        jucator2AIActiv = !jucator2AIActiv;
+        if (jucator2AIActiv) {
+            butonActivareAI.html('Dezactivează AI Jucător 2');
+            console.log("AI Jucător 2 activat.");
+            if (numeConfirmate && jucatorActiv === 2) {
+                miscareAIJucator2();
+            }
+        } else {
+            butonActivareAI.html('Activează AI Jucător 2');
+            console.log("AI Jucător 2 dezactivat.");
+        }
+    });
+    butonActivareAI.elt.classList.add('font-bold', 'py-2', 'px-4', 'rounded', 'shadow-md');
+    butonActivareAI.elt.style.backgroundColor = '#f5f5dc';
+    butonActivareAI.elt.style.color = '#000000';
+    butonActivareAI.hide();
 
     butonComutarePatrat = createButton('');
     butonComutarePatrat.html('<i class="bi bi-gear-fill"></i>');
@@ -419,7 +444,7 @@ function mousePressed() {
                     
                     if ((jucatorActiv === 1 && ziduriJucator1 > 0) || (jucatorActiv === 2 && ziduriJucator2 > 0)) {
                         pereteSelectat = z;
-                        pereteSelectatIndex = i; // Stochează indexul zidului selectat
+                        pereteSelectatIndex = i;
                         mutaPerete = true;
                         return;
                     }
@@ -434,10 +459,26 @@ function mouseReleased() {
         let celMaiApropiatPunct = gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, pereteSelectat.orientare);
 
         if (celMaiApropiatPunct) {
-            // Creează o copie profundă a zidurilor curente
             let ziduriTemporare = copiazaZiduri(peretiModificati);
+            
+            let pozitieOcupata = false;
+            for(let i = 0; i < peretiModificati.length; i++) {
+                if (i !== pereteSelectatIndex && 
+                    peretiModificati[i].linieGrila === celMaiApropiatPunct.linieGrila && 
+                    peretiModificati[i].coloanaGrila === celMaiApropiatPunct.coloanaGrila &&
+                    peretiModificati[i].orientare === celMaiApropiatPunct.orientare) {
+                    pozitieOcupata = true;
+                    break;
+                }
+            }
+            if (pozitieOcupata) {
+                console.log("Poziția este deja ocupată de un alt zid!");
+                pereteSelectat = null;
+                mutaPerete = false;
+                pereteSelectatIndex = -1;
+                return;
+            }
 
-            // Aplică noua poziție zidului în copia temporară folosind indexul stocat
             ziduriTemporare[pereteSelectatIndex].x = celMaiApropiatPunct.x;
             ziduriTemporare[pereteSelectatIndex].y = celMaiApropiatPunct.y;
             ziduriTemporare[pereteSelectatIndex].latime = celMaiApropiatPunct.latime;
@@ -446,12 +487,10 @@ function mouseReleased() {
             ziduriTemporare[pereteSelectatIndex].linieGrila = celMaiApropiatPunct.linieGrila;
             ziduriTemporare[pereteSelectatIndex].coloanaGrila = celMaiApropiatPunct.coloanaGrila;
 
-            // Verifică dacă ambii jucători au cale după plasarea zidului în copia temporară
             let caleJucator1Exista = existaCale(pion1.linie, pion1.coloana, 0, ziduriTemporare);
             let caleJucator2Exista = existaCale(pion2.linie, pion2.coloana, 8, ziduriTemporare);
 
             if (caleJucator1Exista && caleJucator2Exista) {
-                // Dacă plasarea este validă, actualizează zidul original
                 peretiModificati[pereteSelectatIndex].x = celMaiApropiatPunct.x;
                 peretiModificati[pereteSelectatIndex].y = celMaiApropiatPunct.y;
                 peretiModificati[pereteSelectatIndex].latime = celMaiApropiatPunct.latime;
@@ -465,16 +504,15 @@ function mouseReleased() {
                 } else {
                     ziduriJucator2--;
                 }
+                ultimaActiuneAI = 'zid';
                 schimbaRandul();
             } else {
                 console.log("Plasarea zidului ar bloca calea unui jucător!");
-                // Nu facem nimic, zidul rămâne în poziția sa inițială (sau cea anterioară)
-                // deoarece pereteSelectat nu a fost încă actualizat permanent.
             }
         }
         pereteSelectat = null;
         mutaPerete = false;
-        pereteSelectatIndex = -1; // Resetează indexul
+        pereteSelectatIndex = -1;
     }
 }
 
@@ -508,8 +546,11 @@ function deseneazaPioni() {
 function keyPressed() {
     if (numeConfirmate && !mutaPerete) {
         if (jucatorActiv === 1) {
-            let linieNoua = pion1.linie;
-            let coloanaNoua = pion1.coloana;
+            let pionCurent = pion1;
+            let pionAdversar = pion2;
+
+            let linieNoua = pionCurent.linie;
+            let coloanaNoua = pionCurent.coloana;
             let miscareReusita = false;
 
             if (key === 'w') { linieNoua--; }
@@ -518,20 +559,29 @@ function keyPressed() {
             else if (key === 'd') { coloanaNoua++; }
 
             if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
-                if (linieNoua === pion2.linie && coloanaNoua === pion2.coloana) {
-                    console.log("Nu poți merge peste celălalt pion!");
-                    return;
-                }
+                if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
+                    if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
+                        let linieSaritura = linieNoua + (linieNoua - pionCurent.linie);
+                        let coloanaSaritura = coloanaNoua + (coloanaNoua - pionCurent.coloana);
 
-                if (linieNoua !== pion1.linie || coloanaNoua !== pion1.coloana) {
-                    if (!esteBlocat(pion1.linie, pion1.coloana, linieNoua, coloanaNoua)) {
-                        pion1.linie = linieNoua;
-                        pion1.coloana = coloanaNoua;
+                        if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
+                            if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
+                                pionCurent.linie = linieSaritura;
+                                pionCurent.coloana = coloanaSaritura;
+                                miscareReusita = true;
+                            } else {
+                                console.log("Săritura este blocată de un zid!");
+                            }
+                        }
+                    } else {
+                        pionCurent.linie = linieNoua;
+                        pionCurent.coloana = coloanaNoua;
                         miscareReusita = true;
                     }
+                } else {
+                    console.log("Mișcarea este blocată de un zid!");
                 }
             }
-
 
             if (miscareReusita) {
                 if (!primaMiscareFacuta) {
@@ -541,32 +591,49 @@ function keyPressed() {
             }
 
         } else if (jucatorActiv === 2) {
-            let linieNoua = pion2.linie;
-            let coloanaNoua = pion2.coloana;
-            let miscareReusita = false;
+            if (jucator2AIActiv) {
+                miscareAIJucator2();
+            } else {
+                let pionCurent = pion2;
+                let pionAdversar = pion1;
 
-            if (keyCode === UP_ARROW) { linieNoua--; }
-            else if (keyCode === DOWN_ARROW) { linieNoua++; }
-            else if (keyCode === LEFT_ARROW) { coloanaNoua--; }
-            else if (keyCode === RIGHT_ARROW) { coloanaNoua++; }
+                let linieNoua = pionCurent.linie;
+                let coloanaNoua = pionCurent.coloana;
+                let miscareReusita = false;
 
-            if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
-                if (linieNoua === pion1.linie && coloanaNoua === pion1.coloana) {
-                    console.log("Nu poți merge peste celălalt pion!");
-                    return;
-                }
+                if (keyCode === UP_ARROW) { linieNoua--; }
+                else if (keyCode === DOWN_ARROW) { linieNoua++; }
+                else if (keyCode === LEFT_ARROW) { coloanaNoua--; }
+                else if (keyCode === RIGHT_ARROW) { coloanaNoua++; }
 
-                if (linieNoua !== pion2.linie || coloanaNoua !== pion2.coloana) {
-                    if (!esteBlocat(pion2.linie, pion2.coloana, linieNoua, coloanaNoua)) {
-                        pion2.linie = linieNoua;
-                        pion2.coloana = coloanaNoua;
-                        miscareReusita = true;
+                if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+                    if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
+                        if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
+                            let linieSaritura = linieNoua + (linieNoua - pionCurent.linie);
+                            let coloanaSaritura = coloanaNoua + (coloanaNoua - pionCurent.coloana);
+
+                            if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
+                                if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
+                                    pionCurent.linie = linieSaritura;
+                                    pionCurent.coloana = coloanaSaritura;
+                                    miscareReusita = true;
+                                } else {
+                                    console.log("Săritura este blocată de un zid!");
+                                }
+                            }
+                        } else {
+                            pionCurent.linie = linieNoua;
+                            pionCurent.coloana = coloanaNoua;
+                            miscareReusita = true;
+                        }
+                    } else {
+                        console.log("Mișcarea este blocată de un zid!");
                     }
                 }
-            }
 
-            if (miscareReusita) {
-                schimbaRandul();
+                if (miscareReusita) {
+                    schimbaRandul();
+                }
             }
         }
     }
@@ -588,6 +655,9 @@ function keyPressed() {
 
 function schimbaRandul() {
     jucatorActiv = jucatorActiv === 1 ? 2 : 1;
+    if (jucatorActiv === 2 && jucator2AIActiv) {
+        setTimeout(miscareAIJucator2, 500);
+    }
 }
 
 function initializeazaPozitiiPosibileZiduri() {
@@ -722,4 +792,148 @@ function existaCale(startLinie, startColoana, linieFinala, ziduriVerificare) {
 
 function copiazaZiduri(ziduriOriginale) {
     return ziduriOriginale.map(zid => ({ ...zid }));
+}
+
+function incercaMiscarePionAI() {
+    let pionCurent = pion2;
+    let pionAdversar = pion1;
+    let miscareReusita = false;
+
+    const directiiIncercate = [
+        [-1, 0],
+        [0, -1],
+        [0, 1],
+        [1, 0]
+    ];
+
+    for (const [dl, dc] of directiiIncercate) {
+        let linieNoua = pionCurent.linie + dl;
+        let coloanaNoua = pionCurent.coloana + dc;
+
+        if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+            if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
+                if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
+                    let linieSaritura = linieNoua + dl;
+                    let coloanaSaritura = coloanaNoua + dc;
+
+                    if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
+                        if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
+                            pionCurent.linie = linieSaritura;
+                            pionCurent.coloana = coloanaSaritura;
+                            miscareReusita = true;
+                            break;
+                        }
+                    }
+                } else {
+                    pionCurent.linie = linieNoua;
+                    pionCurent.coloana = coloanaNouă;
+                    miscareReusita = true;
+                    break;
+                }
+            }
+        }
+    }
+    return miscareReusita;
+}
+
+function incercaPlasareZidAI() {
+    if (ziduriJucator2 <= 0) {
+        return false;
+    }
+
+    let zidDisponibilIndex = -1;
+    for (let i = 0; i < peretiModificati.length; i++) {
+        let z = peretiModificati[i];
+        if (z.proprietar === 2 && (z.linieGrila === undefined || z.coloanaGrila === undefined)) {
+            zidDisponibilIndex = i;
+            break;
+        }
+    }
+
+    if (zidDisponibilIndex === -1) {
+        return false;
+    }
+
+    let candidatiZiduriValizi = [];
+    const orientariIncercate = ['orizontal', 'vertical'];
+
+    for (let orientare of orientariIncercate) {
+        for (let pos of pozitiiPosibileZiduri) {
+            if (pos.orientare === orientare) {
+                let ziduriTemporare = copiazaZiduri(peretiModificati);
+                
+                ziduriTemporare[zidDisponibilIndex].x = pos.x;
+                ziduriTemporare[zidDisponibilIndex].y = pos.y;
+                ziduriTemporare[zidDisponibilIndex].latime = pos.latime;
+                ziduriTemporare[zidDisponibilIndex].inaltime = pos.inaltime;
+                ziduriTemporare[zidDisponibilIndex].orientare = pos.orientare;
+                ziduriTemporare[zidDisponibilIndex].linieGrila = pos.linieGrila;
+                ziduriTemporare[zidDisponibilIndex].coloanaGrila = pos.coloanaGrila;
+
+                let pozitieOcupata = false;
+                for(let i = 0; i < peretiModificati.length; i++) {
+                    if (i !== zidDisponibilIndex && 
+                        peretiModificati[i].linieGrila === pos.linieGrila && 
+                        peretiModificati[i].coloanaGrila === pos.coloanaGrila &&
+                        peretiModificati[i].orientare === pos.orientare) {
+                        pozitieOcupata = true;
+                        break;
+                    }
+                }
+                if (pozitieOcupata) continue;
+
+                let caleJucator1Exista = existaCale(pion1.linie, pion1.coloana, 0, ziduriTemporare);
+                let caleJucator2Exista = existaCale(pion2.linie, pion2.coloana, 8, ziduriTemporare);
+
+                if (caleJucator1Exista && caleJucator2Exista) {
+                    candidatiZiduriValizi.push(pos);
+                }
+            }
+        }
+    }
+
+    if (candidatiZiduriValizi.length > 0) {
+        let pozitieAleatorie = random(candidatiZiduriValizi);
+
+        peretiModificati[zidDisponibilIndex].x = pozitieAleatorie.x;
+        peretiModificati[zidDisponibilIndex].y = pozitieAleatorie.y;
+        peretiModificati[zidDisponibilIndex].latime = pozitieAleatorie.latime;
+        peretiModificati[zidDisponibilIndex].inaltime = pozitieAleatorie.inaltime;
+        peretiModificati[zidDisponibilIndex].orientare = pozitieAleatorie.orientare;
+        peretiModificati[zidDisponibilIndex].linieGrila = pozitieAleatorie.linieGrila;
+        peretiModificati[zidDisponibilIndex].coloanaGrila = pozitieAleatorie.coloanaGrila;
+
+        ziduriJucator2--;
+        return true;
+    }
+    return false;
+}
+
+
+function miscareAIJucator2() {
+    let miscareEfectuata = false;
+
+    if (ultimaActiuneAI === 'zid') {
+        miscareEfectuata = incercaMiscarePionAI();
+        if (miscareEfectuata) {
+            ultimaActiuneAI = 'pion';
+        } else {
+            miscareEfectuata = incercaPlasareZidAI();
+            if (miscareEfectuata) {
+                ultimaActiuneAI = 'zid';
+            }
+        }
+    } else {
+        miscareEfectuata = incercaPlasareZidAI();
+        if (miscareEfectuata) {
+            ultimaActiuneAI = 'zid';
+        } else {
+            miscareEfectuata = incercaMiscarePionAI();
+            if (miscareEfectuata) {
+                ultimaActiuneAI = 'pion';
+            }
+        }
+    }
+
+    schimbaRandul();
 }
