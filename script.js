@@ -18,25 +18,54 @@ let decalajGlobalX = 50;
 let afiseazaPatratSetari = false;
 let butonComutarePatrat;
 
-let pion1 = { linie: 0, coloana: 4, simbol: '❤️' };
-let pion2 = { linie: 8, coloana: 4, simbol: '⭐' };
-
-let jucatorCurent = 1; // ❤️ începe
-let etapaMutare = "muta"; // "muta" sau "zid"
-
 function setup() {
     let panza = createCanvas(1800, 800);
     panza.parent("canvas-pozitie");
+
+    culoareTablaFundal = '#fad1f8';
+    culoareTablaContur = '#e9a2f7';
+    culoareIcoane = '#e9a2f7';
+    culoarePatratRozFundal = '#ffc0cb';
+    culoarePatratRozContur = '#e9a2f7';
+    culoareGardContur = '#e9a2f7';
+
+    culoareTitlu = '#e9a2f7';
+    culoareInputBorder = '#a78bfa';
+    culoareInputFocusRing = '#8b5cf6';
+    culoareInputText = '#374151';
+    culoareSetariIcon = '#9333ea';
+    culoareFooterBackground = '#fad1f8';
+    culoareInstructiuniText = '#f5f5dc';
+    culoareParagraphText = '#fdfdd7';
+    culoareButonStartBackground = '#8b5cf6';
+    culoareButonStartText = '#ffffff';
+    culoareTextAlegeCuloare = '#e9a2f7';
+
+    document.querySelector('.titlul').style.color = culoareTitlu;
+    document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
+    document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
+    document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
+
 
     intrareNume1 = createInput();
     intrareNume1.position(50 + decalajGlobalX, 50);
     intrareNume1.size(200);
     intrareNume1.attribute('placeholder', 'Nume Jucător 1');
+    intrareNume1.elt.classList.add('p-2', 'border', 'rounded', 'focus:outline-none', 'focus:ring-2');
+    intrareNume1.elt.style.borderColor = culoareInputBorder;
+    intrareNume1.elt.style.color = culoareInputText;
+    intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
 
     intrareNume2 = createInput();
     intrareNume2.position(50 + decalajGlobalX, 100);
     intrareNume2.size(200);
     intrareNume2.attribute('placeholder', 'Nume Jucător 2');
+    intrareNume2.elt.classList.add('p-2', 'border', 'rounded', 'focus:outline-none', 'focus:ring-2');
+    intrareNume2.elt.style.borderColor = culoareInputBorder;
+    intrareNume2.elt.style.color = culoareInputText;
+    intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
 
     butonStart = createButton('Start');
     butonStart.position(50 + decalajGlobalX, 150);
@@ -50,14 +79,36 @@ function setup() {
             butonStart.hide();
         }
     });
+    butonStart.elt.classList.add('font-bold', 'py-2', 'px-4', 'rounded', 'shadow-md');
+    butonStart.elt.style.backgroundColor = culoareButonStartBackground;
+    butonStart.elt.style.color = culoareButonStartText;
+
 
     butonComutarePatrat = createButton('');
     butonComutarePatrat.html('<i class="bi bi-gear-fill"></i>');
     butonComutarePatrat.style('font-size', '45px');
     butonComutarePatrat.position(width - 250, 30);
+    butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
+    butonComutarePatrat.elt.classList.add('bg-transparent', 'border-none', 'focus:outline-none');
+
+
     butonComutarePatrat.mousePressed(() => {
         afiseazaPatratSetari = !afiseazaPatratSetari;
     });
+
+    let inima = createDiv('<i class="bi bi-heart-fill"></i>');
+    inima.style('color', '#e9a2f7');
+    inima.style('font-size', '24px');
+    inima.position(759 + decalajGlobalX, 145);
+    inima.style('pointer-events', 'none');
+    icoane.push({ div: inima, x: 759 + decalajGlobalX, y: 145, w: 24, h: 24 });
+
+    let stea = createDiv('<i class="bi bi-star-fill"></i>');
+    stea.style('color', '#e9a2f7');
+    stea.style('font-size', '24px');
+    stea.position(815 + decalajGlobalX, 758);
+    stea.style('pointer-events', 'none');
+    icoane.push({ div: stea, x: 815 + decalajGlobalX, y: 758, w: 24, h: 24 });
 
     dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
 
@@ -98,13 +149,12 @@ function draw() {
             50 + decalajGlobalX, 80);
     }
 
-    stroke('#e9a2f7');
-    fill('#fad1f8');
-
+    stroke(culoareTablaContur);
+    fill(culoareTablaFundal);
     square(452 + decalajGlobalX, 30, 700);
 
     if (afiseazaPatratSetari) {
-        square(width - 435 + decalajGlobalX, 30, 150);
+        square(width - 435 + decalajGlobalX, 30, 150); 
     }
 
     dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
@@ -113,15 +163,14 @@ function draw() {
 
     deseneazaCasuteMici(8, startXCasuteMici, startYCasuteMici, 9, dimensiuneCelula, spatiu);
 
-    stroke('#e9a2f7');
-    fill('#fad1f8');
-
+    stroke(culoareTablaContur);
+    fill(culoareTablaFundal);
     quad(250 + decalajGlobalX, 30, 452 + decalajGlobalX, 30, 452 + decalajGlobalX, 730, 250 + decalajGlobalX, 730);
     quad(1151 + decalajGlobalX, 30, 1351 + decalajGlobalX, 30, 1351 + decalajGlobalX, 730, 1151 + decalajGlobalX, 730);
 
     for (let z of peretiModificati) {
         fill('#f5f5dc');
-        stroke('#e9a2f7');
+        stroke(culoareGardContur);
         if (z === pereteSelectat && mutaPerete) {
             rect(mouseX - z.latime / 2, mouseY - z.inaltime / 2, z.latime, z.inaltime);
         } else {
@@ -133,8 +182,6 @@ function draw() {
 }
 
 function mousePressed() {
-    if (etapaMutare !== "zid") return;
-
     if (!mutaPerete) {
         for (let z of peretiModificati) {
             if (jucatorCurent === 1 && z.x < width / 2) {
@@ -189,7 +236,7 @@ function keyPressed() {
 
 function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
     stroke('#e9a2f7');
-    fill('#f5f5dc');
+    fill('#f5f5dc'); 
     for (let ii = 0; ii < rand; ii++) {
         for (let i = 0; i <= nr; i++) {
             let x = startX + i * (dim + spatiu);
@@ -197,24 +244,4 @@ function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
             square(x, y, dim);
         }
     }
-}
-
-function deseneazaPioni() {
-    let startX = 452 + decalajGlobalX + spatiu;
-    let startY = 30 + spatiu;
-
-    textSize(30);
-    textAlign(CENTER, CENTER);
-    noStroke();
-    fill('#e9a2f7');
-
-    text(pion1.simbol,
-        startX + pion1.coloana * (dimensiuneCelula + spatiu) + dimensiuneCelula / 2,
-        startY + pion1.linie * (dimensiuneCelula + spatiu) + dimensiuneCelula / 2
-    );
-
-    text(pion2.simbol,
-        startX + pion2.coloana * (dimensiuneCelula + spatiu) + dimensiuneCelula / 2,
-        startY + pion2.linie * (dimensiuneCelula + spatiu) + dimensiuneCelula / 2
-    );
 }
