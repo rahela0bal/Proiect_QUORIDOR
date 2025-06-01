@@ -314,19 +314,20 @@ function setup() {
     let numarLinii = 10;
     let randuri = 2;
     let startXPereti = (452 + decalajXObiecte + decalajGlobalX) + spatiu;
-    let latime = 2 * dimensiuneCelula + spatiu;
-    let inaltime = 5;
+    let latimeInitiala = 2 * dimensiuneCelula + spatiu;
+    let inaltimeInitiala = 5;
 
-    let inaltimeTotalaBlocPerete = (numarLinii - 1) * (dimensiuneCelula + spatiuVerticalPerete) + inaltime;
+    let inaltimeTotalaBlocPerete = (numarLinii - 1) * (dimensiuneCelula + spatiuVerticalPerete) + inaltimeInitiala;
     let inaltimePatrat = 730 - 30;
     let spatiuVerticalRamas = inaltimePatrat - inaltimeTotalaBlocPerete;
     let startYPereti = 30 + (spatiuVerticalRamas / 2);
 
     for (let ii = 0; ii < randuri; ii++) {
-        let x = startXPereti + ii * (latime + 752);
+        let x = startXPereti + ii * (latimeInitiala + 752);
         for (let i = 0; i < numarLinii; i++) {
             let y = startYPereti + i * (dimensiuneCelula + spatiuVerticalPerete);
-            peretiModificati.push({ x: x, y: y, latime: latime, inaltime: inaltime });
+            // Adăugăm o proprietate 'orientare' pentru ziduri, implicit 'orizontal'
+            peretiModificati.push({ x: x, y: y, latime: latimeInitiala, inaltime: inaltimeInitiala, orientare: 'orizontal' });
         }
     }
 }
@@ -408,11 +409,12 @@ function mousePressed() {
         }
     } else {
         if (pereteSelectat) {
+            // Când eliberăm click-ul, actualizăm poziția zidului selectat
             pereteSelectat.x = mouseX - pereteSelectat.latime / 2;
             pereteSelectat.y = mouseY - pereteSelectat.inaltime / 2;
-            pereteSelectat = null;
+            pereteSelectat = null; // Deselectăm zidul
         }
-        mutaPerete = false;
+        mutaPerete = false; // Oprim modul de mutare
     }
 }
 
@@ -455,6 +457,20 @@ function keyPressed() {
             if (keyCode === DOWN_ARROW && pion2.linie < 8) { pion2.linie++; schimbaRandul(); }
             if (keyCode === LEFT_ARROW && pion2.coloana > 0) { pion2.coloana--; schimbaRandul(); }
             if (keyCode === RIGHT_ARROW && pion2.coloana < 8) { pion2.coloana++; schimbaRandul(); }
+        }
+    }
+
+    // Rotirea zidurilor
+    if (pereteSelectat && (key === 'v' || key === 'o')) {
+        let tempLatime = pereteSelectat.latime;
+        pereteSelectat.latime = pereteSelectat.inaltime;
+        pereteSelectat.inaltime = tempLatime;
+
+        // Schimbă orientarea pentru a ști cum să o rotești ulterior
+        if (pereteSelectat.orientare === 'orizontal') {
+            pereteSelectat.orientare = 'vertical';
+        } else {
+            pereteSelectat.orientare = 'orizontal';
         }
     }
 }
