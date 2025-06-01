@@ -53,6 +53,10 @@ let pion2;
 
 let pozitiiPosibileZiduri = [];
 
+// Numărul de ziduri pentru fiecare jucător
+let ziduriJucator1 = 10;
+let ziduriJucator2 = 10;
+
 function setup() {
     let panza = createCanvas(1800, 800);
     panza.parent("canvas-pozitie");
@@ -312,22 +316,24 @@ function setup() {
     pion1 = icoane[0];
     pion2 = icoane[1];
 
-    let numarLinii = 10;
-    let randuri = 2;
+    let numarLiniiZiduriLaterale = 10; // Numărul de ziduri pe o coloană laterală
+    let numarRanduriZiduriLaterale = 2; // Numărul de coloane laterale cu ziduri
     let startXPereti = (452 + decalajXObiecte + decalajGlobalX) + spatiu;
-    let latimeInitiala = 2 * dimensiuneCelula + spatiu;
-    let inaltimeInitiala = 5;
+    let latimeInitialaZid = 2 * dimensiuneCelula + spatiu;
+    let inaltimeInitialaZid = 5;
 
-    let inaltimeTotalaBlocPerete = (numarLinii - 1) * (dimensiuneCelula + spatiuVerticalPerete) + inaltimeInitiala;
+    let inaltimeTotalaBlocPerete = (numarLiniiZiduriLaterale - 1) * (dimensiuneCelula + spatiuVerticalPerete) + inaltimeInitialaZid;
     let inaltimePatrat = 730 - 30;
     let spatiuVerticalRamas = inaltimePatrat - inaltimeTotalaBlocPerete;
     let startYPereti = 30 + (spatiuVerticalRamas / 2);
 
-    for (let ii = 0; ii < randuri; ii++) {
-        let x = startXPereti + ii * (latimeInitiala + 752);
-        for (let i = 0; i < numarLinii; i++) {
+    // Atribuie zidurile jucătorilor
+    for (let ii = 0; ii < numarRanduriZiduriLaterale; ii++) {
+        let x = startXPereti + ii * (latimeInitialaZid + 752);
+        let proprietarZid = (ii === 0) ? 1 : 2; // Jucătorul 1 primește prima coloană, Jucătorul 2 a doua
+        for (let i = 0; i < numarLiniiZiduriLaterale; i++) {
             let y = startYPereti + i * (dimensiuneCelula + spatiuVerticalPerete);
-            peretiModificati.push({ x: x, y: y, latime: latimeInitiala, inaltime: inaltimeInitiala, orientare: 'orizontal' });
+            peretiModificati.push({ x: x, y: y, latime: latimeInitialaZid, inaltime: inaltimeInitialaZid, orientare: 'orizontal', proprietar: proprietarZid });
         }
     }
 
@@ -342,8 +348,10 @@ function draw() {
         textSize(24);
         textAlign(LEFT, TOP);
         text("Jucător 1: " + numeJucator1, 50 + decalajGlobalX, 10);
-        text("Jucător 2: " + numeJucator2, 50 + decalajGlobalX, 40);
-        text("Este rândul lui: " + (jucatorActiv === 1 ? numeJucator1 : numeJucator2), 50 + decalajGlobalX, 70);
+        text("Ziduri Jucător 1: " + ziduriJucator1, 50 + decalajGlobalX, 40); // Afișează numărul de ziduri
+        text("Jucător 2: " + numeJucator2, 50 + decalajGlobalX, 70);
+        text("Ziduri Jucător 2: " + ziduriJucator2, 50 + decalajGlobalX, 100); // Afișează numărul de ziduri
+        text("Este rândul lui: " + (jucatorActiv === 1 ? numeJucator1 : numeJucator2), 50 + decalajGlobalX, 130);
     }
 
     stroke(culoareTablaContur);
@@ -402,11 +410,19 @@ function mousePressed() {
     if (numeConfirmate && primaMiscareFacuta) {
         if (!mutaPerete) {
             for (let z of peretiModificati) {
+                // Permite selectarea zidului doar dacă îi aparține jucătorului activ
+                // și dacă nu este deja plasat pe tabla principală (adică nu are linieGrila/coloanaGrila)
                 if (mouseX > z.x && mouseX < z.x + z.latime &&
-                    mouseY > z.y && mouseY < z.y + z.inaltime) {
-                    pereteSelectat = z;
-                    mutaPerete = true;
-                    return;
+                    mouseY > z.y && mouseY < z.y + z.inaltime &&
+                    z.proprietar === jucatorActiv &&
+                    (z.linieGrila === undefined || z.coloanaGrila === undefined)) {
+                    
+                    // Verifică dacă jucătorul are ziduri disponibile
+                    if ((jucatorActiv === 1 && ziduriJucator1 > 0) || (jucatorActiv === 2 && ziduriJucator2 > 0)) {
+                        pereteSelectat = z;
+                        mutaPerete = true;
+                        return;
+                    }
                 }
             }
         }
@@ -423,7 +439,16 @@ function mouseReleased() {
             pereteSelectat.latime = celMaiApropiatPunct.latime;
             pereteSelectat.inaltime = celMaiApropiatPunct.inaltime;
             pereteSelectat.orientare = celMaiApropiatPunct.orientare;
-            schimbaRandul();
+            pereteSelectat.linieGrila = celMaiApropiatPunct.linieGrila;
+            pereteSelectat.coloanaGrila = celMaiApropiatPunct.coloanaGrila;
+
+            // Decrementează numărul de ziduri al jucătorului activ
+            if (jucatorActiv === 1) {
+                ziduriJucator1--;
+            } else {
+                ziduriJucator2--;
+            }
+            schimbaRandul(); // Schimbă rândul după plasarea zidului
         }
         pereteSelectat = null;
         mutaPerete = false;
@@ -458,42 +483,62 @@ function deseneazaPioni() {
 }
 
 function keyPressed() {
-    if (numeConfirmate) {
-        if (!primaMiscareFacuta) {
-            if (jucatorActiv === 1) {
-                let moved = false;
-                let initialLinie = pion1.linie;
-                let initialColoana = pion1.coloana;
+    // Permite mișcarea pionului doar dacă nu se mută un zid
+    if (numeConfirmate && !mutaPerete) {
+        if (jucatorActiv === 1) {
+            let linieNoua = pion1.linie;
+            let coloanaNoua = pion1.coloana;
+            let miscareReusita = false;
 
-                if (key === 'w' && pion1.linie > 0) { pion1.linie--; }
-                else if (key === 's' && pion1.linie < 8) { pion1.linie++; }
-                else if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; }
-                else if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; }
+            if (key === 'w') { linieNoua--; }
+            else if (key === 's') { linieNoua++; }
+            else if (key === 'a') { coloanaNoua--; }
+            else if (key === 'd') { coloanaNoua++; }
 
-                if (pion1.linie !== initialLinie || pion1.coloana !== initialColoana) {
-                    moved = true;
-                }
-
-                if (moved) {
-                    primaMiscareFacuta = true;
-                    schimbaRandul();
+            if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+                if (linieNoua !== pion1.linie || coloanaNoua !== pion1.coloana) {
+                    if (!esteBlocat(pion1.linie, pion1.coloana, linieNoua, coloanaNoua)) {
+                        pion1.linie = linieNoua;
+                        pion1.coloana = coloanaNoua;
+                        miscareReusita = true;
+                    }
                 }
             }
-        } else {
-            if (jucatorActiv === 1) {
-                if (key === 'w' && pion1.linie > 0) { pion1.linie--; schimbaRandul(); }
-                if (key === 's' && pion1.linie < 8) { pion1.linie++; schimbaRandul(); }
-                if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; schimbaRandul(); }
-                if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; schimbaRandul(); }
-            } else if (jucatorActiv === 2) {
-                if (keyCode === UP_ARROW && pion2.linie > 0) { pion2.linie--; schimbaRandul(); }
-                if (keyCode === DOWN_ARROW && pion2.linie < 8) { pion2.linie++; schimbaRandul(); }
-                if (keyCode === LEFT_ARROW && pion2.coloana > 0) { pion2.coloana--; schimbaRandul(); }
-                if (keyCode === RIGHT_ARROW && pion2.coloana < 8) { pion2.coloana++; schimbaRandul(); }
+
+            if (miscareReusita) {
+                if (!primaMiscareFacuta) {
+                    primaMiscareFacuta = true;
+                }
+                schimbaRandul();
+            }
+
+        } else if (jucatorActiv === 2) {
+            let linieNoua = pion2.linie;
+            let coloanaNoua = pion2.coloana;
+            let miscareReusita = false;
+
+            if (keyCode === UP_ARROW) { linieNoua--; }
+            else if (keyCode === DOWN_ARROW) { linieNoua++; }
+            else if (keyCode === LEFT_ARROW) { coloanaNoua--; }
+            else if (keyCode === RIGHT_ARROW) { coloanaNoua++; }
+
+            if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+                if (linieNoua !== pion2.linie || coloanaNoua !== pion2.coloana) {
+                    if (!esteBlocat(pion2.linie, pion2.coloana, linieNoua, coloanaNoua)) {
+                        pion2.linie = linieNoua;
+                        pion2.coloana = coloanaNoua;
+                        miscareReusita = true;
+                    }
+                }
+            }
+
+            if (miscareReusita) {
+                schimbaRandul();
             }
         }
     }
 
+    // Permite rotirea zidurilor doar dacă un zid este selectat și se apasă 'v' sau 'o'
     if (numeConfirmate && primaMiscareFacuta) {
         if (pereteSelectat && (key === 'v' || key === 'o')) {
             let tempLatime = pereteSelectat.latime;
@@ -524,7 +569,7 @@ function initializeazaPozitiiPosibileZiduri() {
             let y = startYTabla + spatiu + (r + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
             let latime = 2 * dimensiuneCelula + spatiu;
             let inaltime = 5;
-            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'orizontal', tip: 'zid' });
+            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'orizontal', tip: 'zid', linieGrila: r, coloanaGrila: c });
         }
     }
 
@@ -534,7 +579,7 @@ function initializeazaPozitiiPosibileZiduri() {
             let y = startYTabla + spatiu + r * (dimensiuneCelula + spatiu);
             let latime = 5;
             let inaltime = 2 * dimensiuneCelula + spatiu;
-            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'vertical', tip: 'zid' });
+            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'vertical', tip: 'zid', linieGrila: r, coloanaGrila: c });
         }
     }
 }
@@ -562,4 +607,52 @@ function gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, orientareCurenta) 
         return null;
     }
     return celMaiApropiat;
+}
+
+function esteBlocat(linieCurenta, coloanaCurenta, linieNoua, coloanaNoua) {
+    for (let perete of peretiModificati) {
+        if (perete.linieGrila === undefined || perete.coloanaGrila === undefined) {
+            continue;
+        }
+
+        // Mișcare verticală
+        if (coloanaCurenta === coloanaNoua) {
+            // Mișcare în sus
+            if (linieNoua < linieCurenta) {
+                if (perete.orientare === 'orizontal' &&
+                    perete.linieGrila === linieNoua &&
+                    (perete.coloanaGrila === coloanaCurenta || perete.coloanaGrila === coloanaCurenta - 1)) {
+                    return true;
+                }
+            }
+            // Mișcare în jos
+            else if (linieNoua > linieCurenta) {
+                if (perete.orientare === 'orizontal' &&
+                    perete.linieGrila === linieCurenta &&
+                    (perete.coloanaGrila === coloanaCurenta || perete.coloanaGrila === coloanaCurenta - 1)) {
+                    return true;
+                }
+            }
+        }
+        // Mișcare orizontală
+        else if (linieCurenta === linieNoua) {
+            // Mișcare spre stânga
+            if (coloanaNoua < coloanaCurenta) {
+                if (perete.orientare === 'vertical' &&
+                    perete.coloanaGrila === coloanaNoua &&
+                    (perete.linieGrila === linieCurenta || perete.linieGrila === linieCurenta - 1)) {
+                    return true;
+                }
+            }
+            // Mișcare spre dreapta
+            else if (coloanaNoua > coloanaCurenta) {
+                if (perete.orientare === 'vertical' &&
+                    perete.coloanaGrila === coloanaCurenta &&
+                    (perete.linieGrila === linieCurenta || perete.linieGrila === linieCurenta - 1)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
