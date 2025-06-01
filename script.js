@@ -20,6 +20,7 @@ let decalajGlobalX = 50;
 
 let afiseazaPatratSetari = false;
 let butonComutarePatrat;
+let butonSchimbCuloare;
 
 function setup() {
     let panza = createCanvas(1800, 800);
@@ -48,13 +49,20 @@ function setup() {
         }
     });
 
-    butonComutarePatrat = createButton(''); 
-    butonComutarePatrat.html('<i class="bi bi-gear-fill"></i>'); 
-    butonComutarePatrat.style('font-size', '45px'); 
+    butonComutarePatrat = createButton('');
+    butonComutarePatrat.html('<i class="bi bi-gear-fill"></i>');
+    butonComutarePatrat.style('font-size', '45px'); // Dimensiunea fontului a fost modificată la 45px
     butonComutarePatrat.position(width - 250, 30);
     butonComutarePatrat.mousePressed(() => {
         afiseazaPatratSetari = !afiseazaPatratSetari;
     });
+
+    butonSchimbCuloare = createButton('Schimbă Culoare');
+    butonSchimbCuloare.position(0, 0);
+    butonSchimbCuloare.mousePressed(() => {
+        console.log("Butonul de schimbare a culorii a fost apăsat!");
+    });
+    butonSchimbCuloare.hide();
 
     let inima = createDiv('<i class="bi bi-heart-fill"></i>');
     inima.style('color', '#e9a2f7');
@@ -109,7 +117,16 @@ function draw() {
     square(452 + decalajGlobalX, 30, 700);
     
     if (afiseazaPatratSetari) {
-        square(width - 435 + decalajGlobalX, 30, 150); 
+        let patratSetariX = width - 435 + decalajGlobalX;
+        let patratSetariY = 30;
+        let patratSetariDim = 150;
+
+        square(patratSetariX, patratSetariY, patratSetariDim); 
+
+        butonSchimbCuloare.position(patratSetariX + (patratSetariDim / 2) - (butonSchimbCuloare.width / 2), patratSetariY + (patratSetariDim / 2) - (butonSchimbCuloare.height / 2));
+        butonSchimbCuloare.show();
+    } else {
+        butonSchimbCuloare.hide();
     }
 
     dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
