@@ -7,6 +7,11 @@ let numeJucator1 = "";
 let numeJucator2 = "";
 let numeConfirmate = false;
 
+let jucatorActiv = 1;
+
+let icoane = [];
+let icoanaSelectata = null;
+
 let spatiu = 5;
 let dimensiuneCelula;
 
@@ -17,6 +22,33 @@ let decalajGlobalX = 50;
 
 let afiseazaPatratSetari = false;
 let butonComutarePatrat;
+
+let textAlegeCuloare;
+let patratCuloareMaro;
+let patratCuloareRoz;
+let patratCuloareNegru;
+
+let culoareTablaFundal;
+let culoareTablaContur;
+let culoareIcoane;
+let culoarePatratRozFundal;
+let culoarePatratRozContur;
+
+let culoareTitlu;
+let culoareInputBorder;
+let culoareInputFocusRing;
+let culoareInputText;
+let culoareSetariIcon;
+let culoareGardContur;
+let culoareFooterBackground;
+let culoareInstructiuniText;
+let culoareParagraphText;
+let culoareButonStartBackground;
+let culoareButonStartText;
+let culoareTextAlegeCuloare;
+
+let pion1;
+let pion2;
 
 function setup() {
     let panza = createCanvas(1800, 800);
@@ -46,7 +78,6 @@ function setup() {
     document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
     document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
 
-
     intrareNume1 = createInput();
     intrareNume1.position(50 + decalajGlobalX, 50);
     intrareNume1.size(200);
@@ -56,7 +87,6 @@ function setup() {
     intrareNume1.elt.style.color = culoareInputText;
     intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
 
-
     intrareNume2 = createInput();
     intrareNume2.position(50 + decalajGlobalX, 100);
     intrareNume2.size(200);
@@ -65,7 +95,6 @@ function setup() {
     intrareNume2.elt.style.borderColor = culoareInputBorder;
     intrareNume2.elt.style.color = culoareInputText;
     intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
-
 
     butonStart = createButton('Start');
     butonStart.position(50 + decalajGlobalX, 150);
@@ -83,7 +112,6 @@ function setup() {
     butonStart.elt.style.backgroundColor = culoareButonStartBackground;
     butonStart.elt.style.color = culoareButonStartText;
 
-
     butonComutarePatrat = createButton('');
     butonComutarePatrat.html('<i class="bi bi-gear-fill"></i>');
     butonComutarePatrat.style('font-size', '45px');
@@ -91,26 +119,197 @@ function setup() {
     butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
     butonComutarePatrat.elt.classList.add('bg-transparent', 'border-none', 'focus:outline-none');
 
-
     butonComutarePatrat.mousePressed(() => {
         afiseazaPatratSetari = !afiseazaPatratSetari;
+        if (afiseazaPatratSetari) {
+            textAlegeCuloare.show();
+            patratCuloareMaro.show();
+            patratCuloareRoz.show();
+            patratCuloareNegru.show();
+        } else {
+            textAlegeCuloare.hide();
+            patratCuloareMaro.hide();
+            patratCuloareRoz.hide();
+            patratCuloareNegru.hide();
+        }
     });
 
-    let inima = createDiv('<i class="bi bi-heart-fill"></i>');
-    inima.style('color', '#e9a2f7');
-    inima.style('font-size', '24px');
-    inima.position(759 + decalajGlobalX, 145);
-    inima.style('pointer-events', 'none');
-    icoane.push({ div: inima, x: 759 + decalajGlobalX, y: 145, w: 24, h: 24 });
+    textAlegeCuloare = createDiv('Alegeți Culoare');
+    textAlegeCuloare.style('color', culoareTextAlegeCuloare);
+    textAlegeCuloare.style('font-size', '16px');
+    textAlegeCuloare.style('font-weight', 'bold');
+    textAlegeCuloare.hide();
 
-    let stea = createDiv('<i class="bi bi-star-fill"></i>');
-    stea.style('color', '#e9a2f7');
-    stea.style('font-size', '24px');
-    stea.position(815 + decalajGlobalX, 758);
-    stea.style('pointer-events', 'none');
-    icoane.push({ div: stea, x: 815 + decalajGlobalX, y: 758, w: 24, h: 24 });
+    patratCuloareMaro = createDiv('');
+    patratCuloareMaro.style('width', '25px');
+    patratCuloareMaro.style('height', '25px');
+    patratCuloareMaro.style('background-color', 'brown');
+    patratCuloareMaro.style('border', '2px solid #5a2d0b');
+    patratCuloareMaro.hide();
+    patratCuloareMaro.mousePressed(() => {
+        culoareTablaFundal = '#D2B48C';
+        culoareTablaContur = '#A0522D';
+        culoareIcoane = '#A0522D';
+        culoareGardContur = '#A0522D';
+
+        culoareTitlu = '#A0522D';
+        culoareInputBorder = '#8B4513';
+        culoareInputFocusRing = '#CD853F';
+        culoareInputText = '#4A2B1A';
+        culoareSetariIcon = '#A0522D';
+        culoareFooterBackground = '#D2B48C';
+        culoareInstructiuniText = '#4A2B1A';
+        culoareParagraphText = '#4A2B1A';
+        culoareButonStartBackground = '#CD853F';
+        culoareButonStartText = '#FFFFFF';
+        culoareTextAlegeCuloare = '#4A2B1A';
+
+        document.querySelector('.titlul').style.color = culoareTitlu;
+        document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
+        document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
+        document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
+
+        intrareNume1.elt.style.borderColor = culoareInputBorder;
+        intrareNume1.elt.style.color = culoareInputText;
+        intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        intrareNume2.elt.style.borderColor = culoareInputBorder;
+        intrareNume2.elt.style.color = culoareInputText;
+        intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
+
+        butonStart.elt.style.backgroundColor = culoareButonStartBackground;
+        butonStart.elt.style.color = culoareButonStartText;
+
+        textAlegeCuloare.style('color', culoareTextAlegeCuloare);
+
+        for (let ico of icoane) {
+            ico.div.style('color', culoareIcoane);
+            ico.div.style('font-size', '36px'); 
+        }
+    });
+
+    patratCuloareRoz = createDiv('');
+    patratCuloareRoz.style('width', '25px');
+    patratCuloareRoz.style('height', '25px');
+    patratCuloareRoz.style('background-color', culoarePatratRozFundal);
+    patratCuloareRoz.style('border', `2px solid ${culoarePatratRozContur}`);
+    patratCuloareRoz.hide();
+    patratCuloareRoz.mousePressed(() => {
+        culoareTablaFundal = '#fad1f8';
+        culoareTablaContur = '#e9a2f7';
+        culoareIcoane = '#e9a2f7';
+        culoarePatratRozFundal = '#ffc0cb';
+        culoarePatratRozContur = '#e9a2f7';
+        culoareGardContur = '#e9a2f7';
+
+        culoareTitlu = '#e9a2f7';
+        culoareInputBorder = '#a78bfa';
+        culoareInputFocusRing = '#8b5cf6';
+        culoareInputText = '#374151';
+        culoareSetariIcon = '#9333ea';
+        culoareFooterBackground = '#fad1f8';
+        culoareInstructiuniText = '#f5f5dc';
+        culoareParagraphText = '#fdfdd7';
+        culoareButonStartBackground = '#8b5cf6';
+        culoareButonStartText = '#ffffff';
+        culoareTextAlegeCuloare = '#e9a2f7';
+
+        document.querySelector('.titlul').style.color = culoareTitlu;
+        document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
+        document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
+        document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
+
+        intrareNume1.elt.style.borderColor = culoareInputBorder;
+        intrareNume1.elt.style.color = culoareInputText;
+        intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        intrareNume2.elt.style.borderColor = culoareInputBorder;
+        intrareNume2.elt.style.color = culoareInputText;
+        intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
+
+        butonStart.elt.style.backgroundColor = culoareButonStartBackground;
+        butonStart.elt.style.color = culoareButonStartText;
+
+        textAlegeCuloare.style('color', culoareTextAlegeCuloare);
+
+        for (let ico of icoane) {
+            ico.div.style('color', culoareIcoane);
+            ico.div.style('font-size', '36px'); // Asigurăm dimensiunea la schimbarea culorii
+        }
+    });
+
+    patratCuloareNegru = createDiv('');
+    patratCuloareNegru.style('width', '25px');
+    patratCuloareNegru.style('height', '25px');
+    patratCuloareNegru.style('background-color', 'black');
+    patratCuloareNegru.style('border', '2px solid #333');
+    patratCuloareNegru.hide();
+    patratCuloareNegru.mousePressed(() => {
+        culoareTablaFundal = '#FFFFFF';
+        culoareTablaContur = '#000000';
+        culoareIcoane = '#000000';
+        culoareGardContur = '#000000';
+
+        culoareTitlu = '#000000';
+        culoareInputBorder = '#333333';
+        culoareInputFocusRing = '#666666';
+        culoareInputText = '#000000';
+        culoareSetariIcon = '#000000';
+        culoareFooterBackground = '#EEEEEE';
+        culoareInstructiuniText = '#333333';
+        culoareParagraphText = '#333333';
+        culoareButonStartBackground = '#333333';
+        culoareButonStartText = '#FFFFFF';
+        culoareTextAlegeCuloare = '#000000';
+
+        document.querySelector('.titlul').style.color = culoareTitlu;
+        document.querySelector('footer').style.backgroundColor = culoareFooterBackground;
+        document.querySelector('.instructiuni').style.color = culoareInstructiuniText;
+        document.querySelectorAll('footer p').forEach(p => p.style.color = culoareParagraphText);
+
+        intrareNume1.elt.style.borderColor = culoareInputBorder;
+        intrareNume1.elt.style.color = culoareInputText;
+        intrareNume1.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        intrareNume2.elt.style.borderColor = culoareInputBorder;
+        intrareNume2.elt.style.color = culoareInputText;
+        intrareNume2.elt.style.setProperty('--tw-ring-color', culoareInputFocusRing);
+
+        butonComutarePatrat.elt.querySelector('i').style.color = culoareSetariIcon;
+
+        butonStart.elt.style.backgroundColor = culoareButonStartBackground;
+        butonStart.elt.style.color = culoareButonStartText;
+
+        textAlegeCuloare.style('color', culoareTextAlegeCuloare);
+
+        for (let ico of icoane) {
+            ico.div.style('color', culoareIcoane);
+            ico.div.style('font-size', '36px'); // Asigurăm dimensiunea la schimbarea culorii
+        }
+    });
 
     dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
+
+    // Inițializarea icoanelor cu dimensiuni mai mari și poziție care va fi actualizată de deseneazaPioni
+    let inima = createDiv('<i class="bi bi-heart-fill"></i>');
+    inima.style('color', culoareIcoane);
+    inima.style('font-size', '36px'); // Dimensiunea mărită
+    inima.style('pointer-events', 'none');
+    icoane.push({ div: inima, linie: 1, coloana: 4, w: 36, h: 36 }); // Actualizăm w și h
+
+    let stea = createDiv('<i class="bi bi-star-fill"></i>');
+    stea.style('color', culoareIcoane);
+    stea.style('font-size', '36px'); // Dimensiunea mărită
+    stea.style('pointer-events', 'none');
+    icoane.push({ div: stea, linie: 9, coloana: 4, w: 36, h: 36 }); // Actualizăm w și h
+
+    // Setăm pionii să facă referire la elementele din array-ul icoane
+    pion1 = icoane[0];
+    pion2 = icoane[1];
 
     let numarLinii = 10;
     let randuri = 2;
@@ -141,12 +340,7 @@ function draw() {
         textAlign(LEFT, TOP);
         text("Jucător 1: " + numeJucator1, 50 + decalajGlobalX, 10);
         text("Jucător 2: " + numeJucator2, 50 + decalajGlobalX, 40);
-
-        // Afișare stare curentă
-        textSize(20);
-        fill('#000');
-        text(`Este rândul lui ${jucatorCurent === 1 ? numeJucator1 : numeJucator2} (${jucatorCurent === 1 ? '❤️' : '⭐'}) - ${etapaMutare === 'muta' ? 'Mută pionul' : 'Plasează zid'}`,
-            50 + decalajGlobalX, 80);
+        text("Este rândul lui: " + (jucatorActiv === 1 ? numeJucator1 : numeJucator2), 50 + decalajGlobalX, 70);
     }
 
     stroke(culoareTablaContur);
@@ -154,7 +348,14 @@ function draw() {
     square(452 + decalajGlobalX, 30, 700);
 
     if (afiseazaPatratSetari) {
-        square(width - 435 + decalajGlobalX, 30, 150); 
+        let patratSetariX = width - 435 + decalajGlobalX;
+        let patratSetariY = 30;
+        let patratSetariDim = 150;
+
+        textAlegeCuloare.position(patratSetariX + 10, patratSetariY + 10);
+        patratCuloareMaro.position(patratSetariX + 10, patratSetariY + 40);
+        patratCuloareRoz.position(patratSetariX + 10 + 25 + 5, patratSetariY + 40);
+        patratCuloareNegru.position(patratSetariX + 10 + 25 + 5 + 25 + 5, patratSetariY + 40);
     }
 
     dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
@@ -166,6 +367,7 @@ function draw() {
     stroke(culoareTablaContur);
     fill(culoareTablaFundal);
     quad(250 + decalajGlobalX, 30, 452 + decalajGlobalX, 30, 452 + decalajGlobalX, 730, 250 + decalajGlobalX, 730);
+
     quad(1151 + decalajGlobalX, 30, 1351 + decalajGlobalX, 30, 1351 + decalajGlobalX, 730, 1151 + decalajGlobalX, 730);
 
     for (let z of peretiModificati) {
@@ -182,23 +384,26 @@ function draw() {
 }
 
 function mousePressed() {
+    if (afiseazaPatratSetari && mouseX > patratCuloareMaro.position().x && mouseX < patratCuloareMaro.position().x + patratCuloareMaro.width &&
+        mouseY > patratCuloareMaro.position().y && mouseY < patratCuloareMaro.position().y + patratCuloareMaro.height) {
+        return;
+    }
+    if (afiseazaPatratSetari && mouseX > patratCuloareNegru.position().x && mouseX < patratCuloareNegru.position().x + patratCuloareNegru.width &&
+        mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.height) {
+        return;
+    }
+    if (afiseazaPatratSetari && mouseX > patratCuloareRoz.position().x && mouseX < patratCuloareRoz.position().x + patratCuloareRoz.width &&
+        mouseY > patratCuloareRoz.position().y && mouseY < patratCuloareRoz.position().y + patratCuloareRoz.height) {
+        return;
+    }
+
     if (!mutaPerete) {
         for (let z of peretiModificati) {
-            if (jucatorCurent === 1 && z.x < width / 2) {
-                if (mouseX > z.x && mouseX < z.x + z.latime &&
-                    mouseY > z.y && mouseY < z.y + z.inaltime) {
-                    pereteSelectat = z;
-                    mutaPerete = true;
-                    return;
-                }
-            }
-            if (jucatorCurent === 2 && z.x > width / 2) {
-                if (mouseX > z.x && mouseX < z.x + z.latime &&
-                    mouseY > z.y && mouseY < z.y + z.inaltime) {
-                    pereteSelectat = z;
-                    mutaPerete = true;
-                    return;
-                }
+            if (mouseX > z.x && mouseX < z.x + z.latime &&
+                mouseY > z.y && mouseY < z.y + z.inaltime) {
+                pereteSelectat = z;
+                mutaPerete = true;
+                return;
             }
         }
     } else {
@@ -206,37 +411,14 @@ function mousePressed() {
             pereteSelectat.x = mouseX - pereteSelectat.latime / 2;
             pereteSelectat.y = mouseY - pereteSelectat.inaltime / 2;
             pereteSelectat = null;
-
-            etapaMutare = "muta";
-            jucatorCurent = (jucatorCurent === 1) ? 2 : 1;
         }
         mutaPerete = false;
     }
 }
 
-function keyPressed() {
-    if (etapaMutare !== "muta") return;
-
-    if (jucatorCurent === 1) {
-        if (key === 'w' && pion1.linie > 0) pion1.linie--;
-        else if (key === 's' && pion1.linie < 8) pion1.linie++;
-        else if (key === 'a' && pion1.coloana > 0) pion1.coloana--;
-        else if (key === 'd' && pion1.coloana < 8) pion1.coloana++;
-        etapaMutare = "zid";
-    }
-
-    if (jucatorCurent === 2) {
-        if (keyCode === UP_ARROW && pion2.linie > 0) pion2.linie--;
-        else if (keyCode === DOWN_ARROW && pion2.linie < 8) pion2.linie++;
-        else if (keyCode === LEFT_ARROW && pion2.coloana > 0) pion2.coloana--;
-        else if (keyCode === RIGHT_ARROW && pion2.coloana < 8) pion2.coloana++;
-        etapaMutare = "zid";
-    }
-}
-
 function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
-    stroke('#e9a2f7');
-    fill('#f5f5dc'); 
+    stroke(culoareTablaContur);
+    fill('#f5f5dc');
     for (let ii = 0; ii < rand; ii++) {
         for (let i = 0; i <= nr; i++) {
             let x = startX + i * (dim + spatiu);
@@ -244,4 +426,39 @@ function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
             square(x, y, dim);
         }
     }
+}
+
+function deseneazaPioni() {
+    let startX = 452 + decalajGlobalX + spatiu;
+    let startY = 30 + spatiu;
+
+    pion1.div.position(
+        startX + pion1.coloana * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion1.w / 2),
+        startY + pion1.linie * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion1.h / 2)
+    );
+
+    pion2.div.position(
+        startX + pion2.coloana * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion2.w / 2),
+        startY + pion2.linie * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion2.h / 2)
+    );
+}
+
+function keyPressed() {
+    if (numeConfirmate) {
+        if (jucatorActiv === 1) {
+            if (key === 'w' && pion1.linie > 0) { pion1.linie--; schimbaRandul(); }
+            if (key === 's' && pion1.linie < 8) { pion1.linie++; schimbaRandul(); }
+            if (key === 'a' && pion1.coloana > 0) { pion1.coloana--; schimbaRandul(); }
+            if (key === 'd' && pion1.coloana < 8) { pion1.coloana++; schimbaRandul(); }
+        } else if (jucatorActiv === 2) {
+            if (keyCode === UP_ARROW && pion2.linie > 0) { pion2.linie--; schimbaRandul(); }
+            if (keyCode === DOWN_ARROW && pion2.linie < 8) { pion2.linie++; schimbaRandul(); }
+            if (keyCode === LEFT_ARROW && pion2.coloana > 0) { pion2.coloana--; schimbaRandul(); }
+            if (keyCode === RIGHT_ARROW && pion2.coloana < 8) { pion2.coloana++; schimbaRandul(); }
+        }
+    }
+}
+
+function schimbaRandul() {
+    jucatorActiv = jucatorActiv === 1 ? 2 : 1;
 }
