@@ -353,7 +353,7 @@ function setup() {
     let inaltimePatrat = 730 - 30;
     let spatiuVerticalRamas = inaltimePatrat - inaltimeTotalaBlocPerete;
     let startYPereti = 30 + (spatiuVerticalRamas / 2);
-
+    
     for (let ii = 0; ii < numarRanduriZiduriLaterale; ii++) {
         let x = startXPereti + ii * (latimeInitialaZid + 752);
         let proprietarZid = (ii === 0) ? 1 : 2;
@@ -362,256 +362,208 @@ function setup() {
             peretiModificati.push({ x: x, y: y, latime: latimeInitialaZid, inaltime: inaltimeInitialaZid, orientare: 'orizontal', proprietar: proprietarZid });
         }
     }
-
+    
     initializeazaPozitiiPosibileZiduri();
-}
-
-function draw() {
-    background(255);
-
-    if (numeConfirmate) {
-        fill(50);
-        textSize(24);
-        textAlign(LEFT, TOP);
-        text("Jucător 1: " + numeJucator1, 50 + decalajGlobalX, 10);
-        text("Ziduri Jucător 1: " + ziduriJucator1, 50 + decalajGlobalX, 40);
-        text("Jucător 2: " + numeJucator2, 50 + decalajGlobalX, 70);
-        text("Ziduri Jucător 2: " + ziduriJucator2, 50 + decalajGlobalX, 100);
-        text("Este rândul lui: " + (jucatorActiv === 1 ? numeJucator1 : numeJucator2), 50 + decalajGlobalX, 130);
     }
-
-    stroke(culoareTablaContur);
-    fill(culoareTablaFundal);
-    square(452 + decalajGlobalX, 30, 700);
-
-    if (afiseazaPatratSetari) {
-        let patratSetariX = width - 435 + decalajGlobalX;
-        let patratSetariY = 30;
-
-        textAlegeCuloare.position(patratSetariX + 10, patratSetariY + 10);
-        patratCuloareMaro.position(patratSetariX + 10, patratSetariY + 40);
-        patratCuloareRoz.position(patratSetariX + 10 + 25 + 5, patratSetariY + 40);
-        patratCuloareNegru.position(patratSetariX + 10 + 25 + 5 + 25 + 5, patratSetariY + 40);
-    }
-
-    dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
-    let startXCasuteMici = (452 + decalajGlobalX) + spatiu;
-    let startYCasuteMici = 30 + spatiu;
-
-    deseneazaCasuteMici(8, startXCasuteMici, startYCasuteMici, 9, dimensiuneCelula, spatiu);
-
-    stroke(culoareTablaContur);
-    fill(culoareTablaFundal);
-    quad(250 + decalajGlobalX, 30, 452 + decalajGlobalX, 30, 452 + decalajGlobalX, 730, 250 + decalajGlobalX, 730);
-
-    quad(1151 + decalajGlobalX, 30, 1351 + decalajGlobalX, 30, 1351 + decalajGlobalX, 730, 1151 + decalajGlobalX, 730);
-
-    for (let z of peretiModificati) {
-        fill('#f5f5dc');
-        stroke(culoareGardContur);
-        if (z === pereteSelectat && mutaPerete) {
-            rect(mouseX - z.latime / 2, mouseY - z.inaltime / 2, z.latime, z.inaltime);
-        } else {
-            rect(z.x, z.y, z.latime, z.inaltime);
+    
+    function draw() {
+        background(255);
+    
+        if (numeConfirmate) {
+            fill(50);
+            textSize(24);
+            textAlign(LEFT, TOP);
+            text("Jucător 1: " + numeJucator1, 50 + decalajGlobalX, 10);
+            text("Ziduri Jucător 1: " + ziduriJucator1, 50 + decalajGlobalX, 40);
+            text("Jucător 2: " + numeJucator2, 50 + decalajGlobalX, 70);
+            text("Ziduri Jucător 2: " + ziduriJucator2, 50 + decalajGlobalX, 100);
+            text("Este rândul lui: " + (jucatorActiv === 1 ? numeJucator1 : numeJucator2), 50 + decalajGlobalX, 130);
         }
-    }
-
-    deseneazaPioni();
-}
-
-function mousePressed() {
-    if (afiseazaPatratSetari && mouseX > patratCuloareMaro.position().x && mouseX < patratCuloareMaro.position().x + patratCuloareMaro.width &&
-        mouseY > patratCuloareMaro.position().y && mouseY < patratCuloareMaro.position().y + patratCuloareMaro.height) {
-        return;
-    }
-    if (afiseazaPatratSetari && mouseX > patratCuloareNegru.position().x && mouseX < patratCuloareNegru.position().x + patratCuloareNegru.width &&
-        mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.position().height) {
-        return;
-    }
-    if (afiseazaPatratSetari && mouseX > patratCuloareRoz.position().x && mouseX < patratCuloareRoz.position().x + patratCuloareRoz.width &&
-        mouseY > patratCuloareRoz.position().y && mouseY < patratCuloareRoz.position().y + patratCuloareRoz.height) {
-        return;
-    }
-
-    if (numeConfirmate && primaMiscareFacuta) {
-        if (!mutaPerete) {
-            for (let i = 0; i < peretiModificati.length; i++) {
-                let z = peretiModificati[i];
-                if (mouseX > z.x && mouseX < z.x + z.latime &&
-                    mouseY > z.y && mouseY < z.y + z.inaltime &&
-                    z.proprietar === jucatorActiv &&
-                    (z.linieGrila === undefined || z.coloanaGrila === undefined)) {
-                    
-                    if ((jucatorActiv === 1 && ziduriJucator1 > 0) || (jucatorActiv === 2 && ziduriJucator2 > 0)) {
-                        pereteSelectat = z;
-                        pereteSelectatIndex = i;
-                        mutaPerete = true;
-                        return;
-                    }
-                }
-            }
+    
+        stroke(culoareTablaContur);
+        fill(culoareTablaFundal);
+        square(452 + decalajGlobalX, 30, 700);
+    
+        if (afiseazaPatratSetari) {
+            let patratSetariX = width - 435 + decalajGlobalX;
+            let patratSetariY = 30;
+    
+            textAlegeCuloare.position(patratSetariX + 10, patratSetariY + 10);
+            patratCuloareMaro.position(patratSetariX + 10, patratSetariY + 40);
+            patratCuloareRoz.position(patratSetariX + 10 + 25 + 5, patratSetariY + 40);
+            patratCuloareNegru.position(patratSetariX + 10 + 25 + 5 + 25 + 5, patratSetariY + 40);
         }
-    }
-}
-
-function mouseReleased() {
-    if (numeConfirmate && primaMiscareFacuta && mutaPerete && pereteSelectat && pereteSelectatIndex !== -1) {
-        let celMaiApropiatPunct = gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, pereteSelectat.orientare);
-
-        if (celMaiApropiatPunct) {
-            let ziduriTemporare = copiazaZiduri(peretiModificati);
-            
-            let pozitieOcupata = false;
-            for(let i = 0; i < peretiModificati.length; i++) {
-                if (i !== pereteSelectatIndex && 
-                    peretiModificati[i].linieGrila === celMaiApropiatPunct.linieGrila && 
-                    peretiModificati[i].coloanaGrila === celMaiApropiatPunct.coloanaGrila &&
-                    peretiModificati[i].orientare === celMaiApropiatPunct.orientare) {
-                    pozitieOcupata = true;
-                    break;
-                }
-            }
-            if (pozitieOcupata) {
-                console.log("Poziția este deja ocupată de un alt zid!");
-                pereteSelectat = null;
-                mutaPerete = false;
-                pereteSelectatIndex = -1;
-                return;
-            }
-
-            ziduriTemporare[pereteSelectatIndex].x = celMaiApropiatPunct.x;
-            ziduriTemporare[pereteSelectatIndex].y = celMaiApropiatPunct.y;
-            ziduriTemporare[pereteSelectatIndex].latime = celMaiApropiatPunct.latime;
-            ziduriTemporare[pereteSelectatIndex].inaltime = celMaiApropiatPunct.inaltime;
-            ziduriTemporare[pereteSelectatIndex].orientare = celMaiApropiatPunct.orientare;
-            ziduriTemporare[pereteSelectatIndex].linieGrila = celMaiApropiatPunct.linieGrila;
-            ziduriTemporare[pereteSelectatIndex].coloanaGrila = celMaiApropiatPunct.coloanaGrila;
-
-            let caleJucator1Exista = existaCale(pion1.linie, pion1.coloana, 0, ziduriTemporare);
-            let caleJucator2Exista = existaCale(pion2.linie, pion2.coloana, 8, ziduriTemporare);
-
-            if (caleJucator1Exista && caleJucator2Exista) {
-                peretiModificati[pereteSelectatIndex].x = celMaiApropiatPunct.x;
-                peretiModificati[pereteSelectatIndex].y = celMaiApropiatPunct.y;
-                peretiModificati[pereteSelectatIndex].latime = celMaiApropiatPunct.latime;
-                peretiModificati[pereteSelectatIndex].inaltime = celMaiApropiatPunct.inaltime;
-                peretiModificati[pereteSelectatIndex].orientare = celMaiApropiatPunct.orientare;
-                peretiModificati[pereteSelectatIndex].linieGrila = celMaiApropiatPunct.linieGrila;
-                peretiModificati[pereteSelectatIndex].coloanaGrila = celMaiApropiatPunct.coloanaGrila;
-
-                if (jucatorActiv === 1) {
-                    ziduriJucator1--;
-                } else {
-                    ziduriJucator2--;
-                }
-                ultimaActiuneAI = 'zid';
-                schimbaRandul();
+    
+        dimensiuneCelula = (700 - 2 * spatiu - 8 * spatiu) / 9;
+        let startXCasuteMici = (452 + decalajGlobalX) + spatiu;
+        let startYCasuteMici = 30 + spatiu;
+    
+        deseneazaCasuteMici(8, startXCasuteMici, startYCasuteMici, 9, dimensiuneCelula, spatiu);
+    
+        stroke(culoareTablaContur);
+        fill(culoareTablaFundal);
+        quad(250 + decalajGlobalX, 30, 452 + decalajGlobalX, 30, 452 + decalajGlobalX, 730, 250 + decalajGlobalX, 730);
+    
+        quad(1151 + decalajGlobalX, 30, 1351 + decalajGlobalX, 30, 1351 + decalajGlobalX, 730, 1151 + decalajGlobalX, 730);
+    
+        for (let z of peretiModificati) {
+            fill('#f5f5dc');
+            stroke(culoareGardContur);
+            if (z === pereteSelectat && mutaPerete) {
+                rect(mouseX - z.latime / 2, mouseY - z.inaltime / 2, z.latime, z.inaltime);
             } else {
-                console.log("Plasarea zidului ar bloca calea unui jucător!");
+                rect(z.x, z.y, z.latime, z.inaltime);
             }
         }
-        pereteSelectat = null;
-        mutaPerete = false;
-        pereteSelectatIndex = -1;
+    
+        deseneazaPioni();
     }
-}
-
-function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
-    stroke(culoareTablaContur);
-    fill('#f5f5dc');
-    for (let ii = 0; ii < rand; ii++) {
-        for (let i = 0; i <= nr; i++) {
-            let x = startX + i * (dim + spatiu);
-            let y = startY + ii * (dim + spatiu);
-            square(x, y, dim);
+    
+    function mousePressed() {
+        if (afiseazaPatratSetari && mouseX > patratCuloareMaro.position().x && mouseX < patratCuloareMaro.position().x + patratCuloareMaro.width &&
+            mouseY > patratCuloareMaro.position().y && mouseY < patratCuloareMaro.position().y + patratCuloareMaro.height) {
+            return;
         }
-    }
-}
-
-function deseneazaPioni() {
-    let startX = 452 + decalajGlobalX + spatiu;
-    let startY = 30 + spatiu;
-
-    pion1.div.position(
-        startX + pion1.coloana * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion1.w / 2),
-        startY + pion1.linie * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion1.h / 2)
-    );
-
-    pion2.div.position(
-        startX + pion2.coloana * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion2.w / 2),
-        startY + pion2.linie * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion2.h / 2)
-    );
-}
-
-function keyPressed() {
-    if (numeConfirmate && !mutaPerete) {
-        if (jucatorActiv === 1) {
-            let pionCurent = pion1;
-            let pionAdversar = pion2;
-
-            let linieNoua = pionCurent.linie;
-            let coloanaNoua = pionCurent.coloana;
-            let miscareReusita = false;
-
-            if (key === 'w') { linieNoua--; }
-            else if (key === 's') { linieNoua++; }
-            else if (key === 'a') { coloanaNoua--; }
-            else if (key === 'd') { coloanaNoua++; }
-
-            if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
-                if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
-                    if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
-                        let linieSaritura = linieNoua + (linieNoua - pionCurent.linie);
-                        let coloanaSaritura = coloanaNoua + (coloanaNoua - pionCurent.coloana);
-
-                        if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
-                            if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
-                                pionCurent.linie = linieSaritura;
-                                pionCurent.coloana = coloanaSaritura;
-                                miscareReusita = true;
-                            } else {
-                                console.log("Săritura este blocată de un zid!");
-                            }
+        if (afiseazaPatratSetari && mouseX > patratCuloareNegru.position().x && mouseX < patratCuloareNegru.position().x + patratCuloareNegru.width &&
+            mouseY > patratCuloareNegru.position().y && mouseY < patratCuloareNegru.position().y + patratCuloareNegru.position().height) {
+            return;
+        }
+        if (afiseazaPatratSetari && mouseX > patratCuloareRoz.position().x && mouseX < patratCuloareRoz.position().x + patratCuloareRoz.width &&
+            mouseY > patratCuloareRoz.position().y && mouseY < patratCuloareRoz.position().y + patratCuloareRoz.height) {
+            return;
+        }
+    
+        if (numeConfirmate && primaMiscareFacuta) {
+            if (!mutaPerete) {
+                for (let i = 0; i < peretiModificati.length; i++) {
+                    let z = peretiModificati[i];
+                    if (mouseX > z.x && mouseX < z.x + z.latime &&
+                        mouseY > z.y && mouseY < z.y + z.inaltime &&
+                        z.proprietar === jucatorActiv &&
+                        (z.linieGrila === undefined || z.coloanaGrila === undefined)) {
+                        
+                        if ((jucatorActiv === 1 && ziduriJucator1 > 0) || (jucatorActiv === 2 && ziduriJucator2 > 0)) {
+                            pereteSelectat = z;
+                            pereteSelectatIndex = i;
+                            mutaPerete = true;
+                            return;
                         }
-                    } else {
-                        pionCurent.linie = linieNoua;
-                        pionCurent.coloana = coloanaNoua;
-                        miscareReusita = true;
                     }
+                }
+            }
+        }
+    }
+    
+    function mouseReleased() {
+        if (numeConfirmate && primaMiscareFacuta && mutaPerete && pereteSelectat && pereteSelectatIndex !== -1) {
+            let celMaiApropiatPunct = gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, pereteSelectat.orientare);
+    
+            if (celMaiApropiatPunct) {
+                let ziduriTemporare = copiazaZiduri(peretiModificati);
+                
+                let pozitieOcupata = false;
+                for(let i = 0; i < peretiModificati.length; i++) {
+                    if (i !== pereteSelectatIndex && 
+                        peretiModificati[i].linieGrila === celMaiApropiatPunct.linieGrila && 
+                        peretiModificati[i].coloanaGrila === celMaiApropiatPunto.coloanaGrila &&
+                        peretiModificati[i].orientare === celMaiApropiatPunct.orientare) {
+                        pozitieOcupata = true;
+                        break;
+                    }
+                }
+                if (pozitieOcupata) {
+                    console.log("Poziția este deja ocupată de un alt zid!");
+                    pereteSelectat = null;
+                    mutaPerete = false;
+                    pereteSelectatIndex = -1;
+                    return;
+                }
+    
+                ziduriTemporare[pereteSelectatIndex].x = celMaiApropiatPunct.x;
+                ziduriTemporare[pereteSelectatIndex].y = celMaiApropiatPunct.y;
+                ziduriTemporare[pereteSelectatIndex].latime = celMaiApropiatPunct.latime;
+                ziduriTemporare[pereteSelectatIndex].inaltime = celMaiApropiatPunct.inaltime;
+                ziduriTemporare[pereteSelectatIndex].orientare = celMaiApropiatPunct.orientare;
+                ziduriTemporare[pereteSelectatIndex].linieGrila = celMaiApropiatPunct.linieGrila;
+                ziduriTemporare[pereteSelectatIndex].coloanaGrila = celMaiApropiatPunct.coloanaGrila;
+    
+                let caleJucator1Exista = existaCale(pion1.linie, pion1.coloana, 0, ziduriTemporare);
+                let caleJucator2Exista = existaCale(pion2.linie, pion2.coloana, 8, ziduriTemporare);
+    
+                if (caleJucator1Exista && caleJucator2Exista) {
+                    peretiModificati[pereteSelectatIndex].x = celMaiApropiatPunct.x;
+                    peretiModificati[pereteSelectatIndex].y = celMaiApropiatPunct.y;
+                    peretiModificati[pereteSelectatIndex].latime = celMaiApropiatPunct.latime;
+                    peretiModificati[pereteSelectatIndex].inaltime = celMaiApropiatPunct.inaltime;
+                    peretiModificati[pereteSelectatIndex].orientare = celMaiApropiatPunct.orientare;
+                    peretiModificati[pereteSelectatIndex].linieGrila = celMaiApropiatPunct.linieGrila;
+                    peretiModificati[pereteSelectatIndex].coloanaGrila = celMaiApropiatPunct.coloanaGrila;
+    
+                    if (jucatorActiv === 1) {
+                        ziduriJucator1--;
+                    } else {
+                        ziduriJucator2--;
+                    }
+                    ultimaActiuneAI = 'zid';
+                    schimbaRandul();
                 } else {
-                    console.log("Mișcarea este blocată de un zid!");
+                    console.log("Plasarea zidului ar bloca calea unui jucător!");
                 }
             }
-
-            if (miscareReusita) {
-                if (!primaMiscareFacuta) {
-                    primaMiscareFacuta = true;
-                }
-                schimbaRandul();
+            pereteSelectat = null;
+            mutaPerete = false;
+            pereteSelectatIndex = -1;
+        }
+    }
+    
+    function deseneazaCasuteMici(nr, startX, startY, rand, dim, spatiu) {
+        stroke(culoareTablaContur);
+        fill('#f5f5dc');
+        for (let ii = 0; ii < rand; ii++) {
+            for (let i = 0; i <= nr; i++) {
+                let x = startX + i * (dim + spatiu);
+                let y = startY + ii * (dim + spatiu);
+                square(x, y, dim);
             }
-
-        } else if (jucatorActiv === 2) {
-            if (jucator2AIActiv) {
-                miscareAIJucator2();
-            } else {
-                let pionCurent = pion2;
-                let pionAdversar = pion1;
-
+        }
+    }
+    
+    function deseneazaPioni() {
+        let startX = 452 + decalajGlobalX + spatiu;
+        let startY = 30 + spatiu;
+    
+        pion1.div.position(
+            startX + pion1.coloana * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion1.w / 2),
+            startY + pion1.linie * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion1.h / 2)
+        );
+    
+        pion2.div.position(
+            startX + pion2.coloana * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion2.w / 2),
+            startY + pion2.linie * (dimensiuneCelula + spatiu) + (dimensiuneCelula / 2) - (pion2.h / 2)
+        );
+    }
+    
+    function keyPressed() {
+        if (numeConfirmate && !mutaPerete) {
+            if (jucatorActiv === 1) {
+                let pionCurent = pion1;
+                let pionAdversar = pion2;
+    
                 let linieNoua = pionCurent.linie;
                 let coloanaNoua = pionCurent.coloana;
                 let miscareReusita = false;
-
-                if (keyCode === UP_ARROW) { linieNoua--; }
-                else if (keyCode === DOWN_ARROW) { linieNoua++; }
-                else if (keyCode === LEFT_ARROW) { coloanaNoua--; }
-                else if (keyCode === RIGHT_ARROW) { coloanaNoua++; }
-
+    
+                if (key === 'w') { linieNoua--; }
+                else if (key === 's') { linieNoua++; }
+                else if (key === 'a') { coloanaNoua--; }
+                else if (key === 'd') { coloanaNoua++; }
+    
                 if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
                     if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
                         if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
                             let linieSaritura = linieNoua + (linieNoua - pionCurent.linie);
                             let coloanaSaritura = coloanaNoua + (coloanaNoua - pionCurent.coloana);
-
+    
                             if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
                                 if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
                                     pionCurent.linie = linieSaritura;
@@ -630,310 +582,380 @@ function keyPressed() {
                         console.log("Mișcarea este blocată de un zid!");
                     }
                 }
-
+    
                 if (miscareReusita) {
+                    if (!primaMiscareFacuta) {
+                        primaMiscareFacuta = true;
+                    }
                     schimbaRandul();
                 }
-            }
-        }
-    }
-
-    if (numeConfirmate && primaMiscareFacuta) {
-        if (pereteSelectat && (key === 'v' || key === 'o')) {
-            let tempLatime = pereteSelectat.latime;
-            pereteSelectat.latime = pereteSelectat.inaltime;
-            pereteSelectat.inaltime = tempLatime;
-
-            if (pereteSelectat.orientare === 'orizontal') {
-                pereteSelectat.orientare = 'vertical';
-            } else {
-                pereteSelectat.orientare = 'orizontal';
-            }
-        }
-    }
-}
-
-function schimbaRandul() {
-    jucatorActiv = jucatorActiv === 1 ? 2 : 1;
-    if (jucatorActiv === 2 && jucator2AIActiv) {
-        setTimeout(miscareAIJucator2, 500);
-    }
-}
-
-function initializeazaPozitiiPosibileZiduri() {
-    pozitiiPosibileZiduri = [];
-    let startXTabla = 452 + decalajGlobalX;
-    let startYTabla = 30;
-
-    for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-            let x = startXTabla + spatiu + c * (dimensiuneCelula + spatiu);
-            let y = startYTabla + spatiu + (r + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
-            let latime = 2 * dimensiuneCelula + spatiu;
-            let inaltime = 5;
-            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'orizontal', tip: 'zid', linieGrila: r, coloanaGrila: c });
-        }
-    }
-
-    for (let r = 0; r < 8; r++) {
-        for (let c = 0; c < 8; c++) {
-            let x = startXTabla + spatiu + (c + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
-            let y = startYTabla + spatiu + r * (dimensiuneCelula + spatiu);
-            let latime = 5;
-            let inaltime = 2 * dimensiuneCelula + spatiu;
-            pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'vertical', tip: 'zid', linieGrila: r, coloanaGrila: c });
-        }
-    }
-}
-
-function gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, orientareCurenta) {
-    let celMaiApropiat = null;
-    let distantaMinima = Infinity;
-    const toleranta = 50;
-
-    for (let pos of pozitiiPosibileZiduri) {
-        if (pos.orientare === orientareCurenta) {
-            let centerX = pos.x + pos.latime / 2;
-            let centerY = pos.y + pos.inaltime / 2;
-
-            let d = dist(mouseX, mouseY, centerX, centerY);
-
-            if (d < distantaMinima) {
-                distantaMinima = d;
-                celMaiApropiat = pos;
-            }
-        }
-    }
-
-    if (distantaMinima > toleranta) {
-        return null;
-    }
-    return celMaiApropiat;
-}
-
-function esteBlocat(linieCurenta, coloanaCurenta, linieNoua, coloanaNoua, ziduriVerificare = peretiModificati) {
-    for (let perete of ziduriVerificare) {
-        if (perete.linieGrila === undefined || perete.coloanaGrila === undefined) {
-            continue;
-        }
-
-        if (coloanaCurenta === coloanaNoua) {
-            if (linieNoua < linieCurenta) {
-                if (perete.orientare === 'orizontal' &&
-                    perete.linieGrila === linieNoua &&
-                    (perete.coloanaGrila === coloanaCurenta || perete.coloanaGrila === coloanaCurenta - 1)) {
-                    return true;
-                }
-            }
-            else if (linieNoua > linieCurenta) {
-                if (perete.orientare === 'orizontal' &&
-                    perete.linieGrila === linieCurenta &&
-                    (perete.coloanaGrila === coloanaCurenta || perete.coloanaGrila === coloanaCurenta - 1)) {
-                    return true;
-                }
-            }
-        }
-        else if (linieCurenta === linieNoua) {
-            if (coloanaNoua < coloanaCurenta) {
-                if (perete.orientare === 'vertical' &&
-                    perete.coloanaGrila === coloanaNoua &&
-                    (perete.linieGrila === linieCurenta || perete.linieGrila === linieCurenta - 1)) {
-                    return true;
-                }
-            }
-            else if (coloanaNoua > coloanaCurenta) {
-                if (perete.orientare === 'vertical' &&
-                    perete.coloanaGrila === coloanaCurenta &&
-                    (perete.linieGrila === linieCurenta || perete.linieGrila === linieCurenta - 1)) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-function existaCale(startLinie, startColoana, linieFinala, ziduriVerificare) {
-    const coada = [[startLinie, startColoana]];
-    const vizitat = new Set();
-    vizitat.add(`${startLinie},${startColoana}`);
-
-    const directii = [
-        [-1, 0],
-        [1, 0],
-        [0, -1],
-        [0, 1]
-    ];
-
-    while (coada.length > 0) {
-        const [linieCurenta, coloanaCurenta] = coada.shift();
-
-        if (linieCurenta === linieFinala) {
-            return true;
-        }
-
-        for (const [dl, dc] of directii) {
-            const linieNoua = linieCurenta + dl;
-            const coloanaNoua = coloanaCurenta + dc;
-
-            if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
-                if (!esteBlocat(linieCurenta, coloanaCurenta, linieNoua, coloanaNoua, ziduriVerificare)) {
-                    const cheieNoua = `${linieNoua},${coloanaNoua}`;
-                    if (!vizitat.has(cheieNoua)) {
-                        vizitat.add(cheieNoua);
-                        coada.push([linieNoua, coloanaNoua]);
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
-
-function copiazaZiduri(ziduriOriginale) {
-    return ziduriOriginale.map(zid => ({ ...zid }));
-}
-
-function incercaMiscarePionAI() {
-    let pionCurent = pion2;
-    let pionAdversar = pion1;
-    let miscareReusita = false;
-
-    const directiiIncercate = [
-        [-1, 0],
-        [0, -1],
-        [0, 1],
-        [1, 0]
-    ];
-
-    for (const [dl, dc] of directiiIncercate) {
-        let linieNoua = pionCurent.linie + dl;
-        let coloanaNoua = pionCurent.coloana + dc;
-
-        if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
-            if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
-                if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
-                    let linieSaritura = linieNoua + dl;
-                    let coloanaSaritura = coloanaNoua + dc;
-
-                    if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
-                        if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
-                            pionCurent.linie = linieSaritura;
-                            pionCurent.coloana = coloanaSaritura;
-                            miscareReusita = true;
-                            break;
+    
+            } else if (jucatorActiv === 2) {
+                if (jucator2AIActiv) {
+                    let pionCurent = pion2;
+                    let pionAdversar = pion1;
+    
+                    let linieNoua = pionCurent.linie;
+                    let coloanaNoua = pionCurent.coloana;
+                    let miscareReusita = false;
+    
+                    if (keyCode === UP_ARROW) { linieNoua--; }
+                    else if (keyCode === DOWN_ARROW) { linieNoua++; }
+                    else if (keyCode === LEFT_ARROW) { coloanaNoua--; }
+                    else if (keyCode === RIGHT_ARROW) { coloanaNoua++; }
+    
+                    if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+                        if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
+                            if (linieNoua === pionAdversar.linie && coloanaNoua === pionAdversar.coloana) {
+                                let linieSaritura = linieNoua + (linieNoua - pionCurent.linie);
+                                let coloanaSaritura = coloanaNoua + (coloanaNoua - pionCurent.coloana);
+    
+                                if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
+                                    if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
+                                        pionCurent.linie = linieSaritura;
+                                        pionCurent.coloana = coloanaSaritura;
+                                        miscareReusita = true;
+                                    } else {
+                                        console.log("Săritura este blocată de un zid!");
+                                    }
+                                }
+                            } else {
+                                pionCurent.linie = linieNoua;
+                                pionCurent.coloana = coloanaNoua;
+                                miscareReusita = true;
+                            }
+                        } else {
+                            console.log("Mișcarea este blocată de un zid!");
                         }
                     }
-                } else {
-                    pionCurent.linie = linieNoua;
-                    pionCurent.coloana = coloanaNouă;
-                    miscareReusita = true;
-                    break;
-                }
-            }
-        }
-    }
-    return miscareReusita;
-}
-
-function incercaPlasareZidAI() {
-    if (ziduriJucator2 <= 0) {
-        return false;
-    }
-
-    let zidDisponibilIndex = -1;
-    for (let i = 0; i < peretiModificati.length; i++) {
-        let z = peretiModificati[i];
-        if (z.proprietar === 2 && (z.linieGrila === undefined || z.coloanaGrila === undefined)) {
-            zidDisponibilIndex = i;
-            break;
-        }
-    }
-
-    if (zidDisponibilIndex === -1) {
-        return false;
-    }
-
-    let candidatiZiduriValizi = [];
-    const orientariIncercate = ['orizontal', 'vertical'];
-
-    for (let orientare of orientariIncercate) {
-        for (let pos of pozitiiPosibileZiduri) {
-            if (pos.orientare === orientare) {
-                let ziduriTemporare = copiazaZiduri(peretiModificati);
-                
-                ziduriTemporare[zidDisponibilIndex].x = pos.x;
-                ziduriTemporare[zidDisponibilIndex].y = pos.y;
-                ziduriTemporare[zidDisponibilIndex].latime = pos.latime;
-                ziduriTemporare[zidDisponibilIndex].inaltime = pos.inaltime;
-                ziduriTemporare[zidDisponibilIndex].orientare = pos.orientare;
-                ziduriTemporare[zidDisponibilIndex].linieGrila = pos.linieGrila;
-                ziduriTemporare[zidDisponibilIndex].coloanaGrila = pos.coloanaGrila;
-
-                let pozitieOcupata = false;
-                for(let i = 0; i < peretiModificati.length; i++) {
-                    if (i !== zidDisponibilIndex && 
-                        peretiModificati[i].linieGrila === pos.linieGrila && 
-                        peretiModificati[i].coloanaGrila === pos.coloanaGrila &&
-                        peretiModificati[i].orientare === pos.orientare) {
-                        pozitieOcupata = true;
-                        break;
+    
+                    if (miscareReusita) {
+                        schimbaRandul();
                     }
                 }
-                if (pozitieOcupata) continue;
-
-                let caleJucator1Exista = existaCale(pion1.linie, pion1.coloana, 0, ziduriTemporare);
-                let caleJucator2Exista = existaCale(pion2.linie, pion2.coloana, 8, ziduriTemporare);
-
-                if (caleJucator1Exista && caleJucator2Exista) {
-                    candidatiZiduriValizi.push(pos);
+            }
+        }
+    
+        if (numeConfirmate && primaMiscareFacuta) {
+            if (pereteSelectat && (key === 'v' || key === 'o')) {
+                let tempLatime = pereteSelectat.latime;
+                pereteSelectat.latime = pereteSelectat.inaltime;
+                pereteSelectat.inaltime = tempLatime;
+    
+                if (pereteSelectat.orientare === 'orizontal') {
+                    pereteSelectat.orientare = 'vertical';
+                } else {
+                    pereteSelectat.orientare = 'orizontal';
                 }
             }
         }
     }
-
-    if (candidatiZiduriValizi.length > 0) {
-        let pozitieAleatorie = random(candidatiZiduriValizi);
-
-        peretiModificati[zidDisponibilIndex].x = pozitieAleatorie.x;
-        peretiModificati[zidDisponibilIndex].y = pozitieAleatorie.y;
-        peretiModificati[zidDisponibilIndex].latime = pozitieAleatorie.latime;
-        peretiModificati[zidDisponibilIndex].inaltime = pozitieAleatorie.inaltime;
-        peretiModificati[zidDisponibilIndex].orientare = pozitieAleatorie.orientare;
-        peretiModificati[zidDisponibilIndex].linieGrila = pozitieAleatorie.linieGrila;
-        peretiModificati[zidDisponibilIndex].coloanaGrila = pozitieAleatorie.coloanaGrila;
-
-        ziduriJucator2--;
-        return true;
+    
+    function schimbaRandul() {
+        jucatorActiv = jucatorActiv === 1 ? 2 : 1;
+        if (jucatorActiv === 2 && jucator2AIActiv) {
+            setTimeout(miscareAIJucator2, 500);
+        }
     }
-    return false;
-}
-
-
-function miscareAIJucator2() {
-    let miscareEfectuata = false;
-
-    if (ultimaActiuneAI === 'zid') {
-        miscareEfectuata = incercaMiscarePionAI();
-        if (miscareEfectuata) {
-            ultimaActiuneAI = 'pion';
-        } else {
-            miscareEfectuata = incercaPlasareZidAI();
-            if (miscareEfectuata) {
-                ultimaActiuneAI = 'zid';
+    
+    function initializeazaPozitiiPosibileZiduri() {
+        pozitiiPosibileZiduri = [];
+        let startXTabla = 452 + decalajGlobalX;
+        let startYTabla = 30;
+    
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                let x = startXTabla + spatiu + c * (dimensiuneCelula + spatiu);
+                let y = startYTabla + spatiu + (r + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
+                let latime = 2 * dimensiuneCelula + spatiu;
+                let inaltime = 5;
+                pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'orizontal', tip: 'zid', linieGrila: r, coloanaGrila: c });
             }
         }
-    } else {
-        miscareEfectuata = incercaPlasareZidAI();
-        if (miscareEfectuata) {
-            ultimaActiuneAI = 'zid';
-        } else {
-            miscareEfectuata = incercaMiscarePionAI();
-            if (miscareEfectuata) {
-                ultimaActiuneAI = 'pion';
+    
+        for (let r = 0; r < 8; r++) {
+            for (let c = 0; c < 8; c++) {
+                let x = startXTabla + spatiu + (c + 1) * (dimensiuneCelula + spatiu) - spatiuVerticalPerete;
+                let y = startYTabla + spatiu + r * (dimensiuneCelula + spatiu);
+                let latime = 5;
+                let inaltime = 2 * dimensiuneCelula + spatiu;
+                pozitiiPosibileZiduri.push({ x: x, y: y, latime: latime, inaltime: inaltime, orientare: 'vertical', tip: 'zid', linieGrila: r, coloanaGrila: c });
             }
         }
     }
-
-    schimbaRandul();
-}
+    
+    function gasesteCelMaiApropiatPunctDeAliniere(mouseX, mouseY, orientareCurenta) {
+        let celMaiApropiat = null;
+        let distantaMinima = Infinity;
+        const toleranta = 50;
+    
+        for (let pos of pozitiiPosibileZiduri) {
+            if (pos.orientare === orientareCurenta) {
+                let centerX = pos.x + pos.latime / 2;
+                let centerY = pos.y + pos.inaltime / 2;
+    
+                let d = dist(mouseX, mouseY, centerX, centerY);
+    
+                if (d < distantaMinima) {
+                    distantaMinima = d;
+                    celMaiApropiat = pos;
+                }
+            }
+        }
+    
+        if (distantaMinima > toleranta) {
+            return null;
+        }
+        return celMaiApropiat;
+    }
+    
+    function esteBlocat(linieCurenta, coloanaCurenta, linieNoua, coloanaNoua, ziduriVerificare = peretiModificati) {
+        for (let perete of ziduriVerificare) {
+            if (perete.linieGrila === undefined || perete.coloanaGrila === undefined) {
+                continue;
+            }
+    
+            if (coloanaCurenta === coloanaNoua) {
+                if (linieNoua < linieCurenta) {
+                    if (perete.orientare === 'orizontal' &&
+                        perete.linieGrila === linieNoua &&
+                        (perete.coloanaGrila === coloanaCurenta || perete.coloanaGrila === coloanaCurenta - 1)) {
+                        return true;
+                    }
+                }
+                else if (linieNoua > linieCurenta) {
+                    if (perete.orientare === 'orizontal' &&
+                        perete.linieGrila === linieCurenta &&
+                        (perete.coloanaGrila === coloanaCurenta || perete.coloanaGrila === coloanaCurenta - 1)) {
+                        return true;
+                    }
+                }
+            }
+            else if (linieCurenta === linieNoua) {
+                if (coloanaNoua < coloanaCurenta) {
+                    if (perete.orientare === 'vertical' &&
+                        perete.coloanaGrila === coloanaNoua &&
+                        (perete.linieGrila === linieCurenta || perete.linieGrila === linieCurenta - 1)) {
+                        return true;
+                    }
+                }
+                else if (coloanaNoua > coloanaCurenta) {
+                    if (perete.orientare === 'vertical' &&
+                        perete.coloanaGrila === coloanaCurenta &&
+                        (perete.linieGrila === linieCurenta || perete.linieGrila === linieCurenta - 1)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    
+    function existaCale(startLinie, startColoana, linieFinala, ziduriVerificare) {
+        const coada = [[startLinie, startColoana]];
+        const vizitat = new Set();
+        vizitat.add(`${startLinie},${startColoana}`);
+    
+        const directii = [
+            [-1, 0],
+            [1, 0],
+            [0, -1],
+            [0, 1]
+        ];
+    
+        while (coada.length > 0) {
+            const [linieCurenta, coloanaCurenta] = coada.shift();
+    
+            if (linieCurenta === linieFinala) {
+                return true;
+            }
+    
+            for (const [dl, dc] of directii) {
+                const linieNoua = linieCurenta + dl;
+                const coloanaNoua = coloanaCurenta + dc;
+    
+                if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+                    if (!esteBlocat(linieCurenta, coloanaCurenta, linieNoua, coloanaNoua, ziduriVerificare)) {
+                        const cheieNoua = `${linieNoua},${coloanaNoua}`;
+                        if (!vizitat.has(cheieNoua)) {
+                            vizitat.add(cheieNoua);
+                            coada.push([linieNoua, coloanaNoua]);
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    function copiazaZiduri(ziduriOriginale) {
+      return ziduriOriginale.map(zid => ({ ...zid }));
+  }
+  
+  function incercaMiscarePionAI() {
+      let pionCurent = pion2;
+      let pionAdversar = pion1;
+      let miscareReusita = false;
+  
+      const directiiIncercate = [
+          [-1, 0],
+          [0, -1],
+          [0, 1],
+          [1, 0]
+      ];
+  
+      for (const [dl, dc] of directiiIncercate) {
+          let linieNoua = pionCurent.linie + dl;
+          let coloanaNoua = pionCurent.coloana + dc;
+  
+          if (linieNoua >= 0 && linieNoua < 9 && coloanaNoua >= 0 && coloanaNoua < 9) {
+              if (!esteBlocat(pionCurent.linie, pionCurent.coloana, linieNoua, coloanaNoua)) {
+                  if (linieNoua === pionAdversar.linie && coloanaNouaj === pionAdversar.coloana) {
+                      let linieSaritura = linieNoua + (linieNoua - pionCurent.linie);
+                      let coloanaSaritura = coloanaNoua + (coloanaNoua - pionCurent.coloana);
+  
+                      if (linieSaritura >= 0 && linieSaritura < 9 && coloanaSaritura >= 0 && coloanaSaritura < 9) {
+                          if (!esteBlocat(pionAdversar.linie, pionAdversar.coloana, linieSaritura, coloanaSaritura)) {
+                              let tempPionLinie = pionCurent.linie;
+                              let tempPionColoana = pionCurent.coloana;
+                              pionCurent.linie = linieSaritura;
+                              pionCurent.coloana = coloanaSaritura;
+  
+                              if (existaCale(pionCurent.linie, pionCurent.coloana, 0, peretiModificati)) {
+                                  miscareReusita = true;
+                                  break;
+                              } else {
+                                  pionCurent.linie = tempPionLinie;
+                                  pionCurent.coloana = tempPionColoana;
+                              }
+                          }
+                      }
+                  } else {
+                      let tempPionLinie = pionCurent.linie;
+                      let tempPionColoana = pionCurent.coloana;
+                      pionCurent.linie = linieNoua;
+                      pionCurent.coloana = coloanaNoua;
+  
+                      if (existaCale(pionCurent.linie, pionCurent.coloana, 0, peretiModificati)) {
+                          miscareReusita = true;
+                          break;
+                      } else {
+                          pionCurent.linie = tempPionLinie;
+                          pionCurent.coloana = tempPionColoana;
+                      }
+                  }
+              }
+          }
+      }
+      return miscareReusita;
+  }
+  
+  function incercaPlasareZidAI() {
+      let miscareReusita = false;
+      if (ziduriJucator2 <= 0) {
+          return false;
+      }
+  
+      let pozitiiValidePentruZid = [];
+      for (let pos of pozitiiPosibileZiduri) {
+          let pozitieOcupata = false;
+          for (let i = 0; i < peretiModificati.length; i++) {
+              if (peretiModificati[i].linieGrila !== undefined && peretiModificati[i].coloanaGrila !== undefined) {
+                  if (peretiModificati[i].linieGrila === pos.linieGrila &&
+                      peretiModificati[i].coloanaGrila === pos.coloanaGrila &&
+                      peretiModificati[i].orientare === pos.orientare) {
+                      pozitieOcupata = true;
+                      break;
+                  }
+              }
+          }
+          if (pozitieOcupata) {
+              continue;
+          }
+  
+          let ziduriTemporare = copiazaZiduri(peretiModificati);
+          let zidDePlasatIndex = -1;
+          for (let i = 0; i < ziduriTemporare.length; i++) {
+              if (ziduriTemporare[i].proprietar === 2 && (ziduriTemporare[i].linieGrila === undefined || ziduriTemporare[i].coloanaGrila === undefined)) {
+                  zidDePlasatIndex = i;
+                  break;
+              }
+          }
+  
+          if (zidDePlasatIndex !== -1) {
+              ziduriTemporare[zidDePlasatIndex].x = pos.x;
+              ziduriTemporare[zidDePlasatIndex].y = pos.y;
+              ziduriTemporare[zidDePlasatIndex].latime = pos.latime;
+              ziduriTemporare[zidDePlasatIndex].inaltime = pos.inaltime;
+              ziduriTemporare[zidDePlasatIndex].orientare = pos.orientare;
+              ziduriTemporare[zidDePlasatIndex].linieGrila = pos.linieGrila;
+              ziduriTemporare[zidDePlasatIndex].coloanaGrila = pos.coloanaGrila;
+  
+              let caleJucator1Exista = existaCale(pion1.linie, pion1.coloana, 0, ziduriTemporare);
+              let caleJucator2Exista = existaCale(pion2.linie, pion2.coloana, 8, ziduriTemporare);
+  
+              if (caleJucator1Exista && caleJucator2Exista) {
+                  pozitiiValidePentruZid.push({ zidIndex: zidDePlasatIndex, pozitie: pos });
+              }
+          }
+      }
+  
+      if (pozitiiValidePentruZid.length > 0) {
+          let alegereAleatoare = random(pozitiiValidePentruZid);
+          let zidIndex = alegereAleatoare.zidIndex;
+          let pos = alegereAleatoare.pozitie;
+  
+          peretiModificati[zidIndex].x = pos.x;
+          peretiModificati[zidIndex].y = pos.y;
+          peretiModificati[zidIndex].latime = pos.latime;
+          peretiModificati[zidIndex].inaltime = pos.inaltime;
+          peretiModificati[zidIndex].orientare = pos.orientare;
+          peretiModificati[zidIndex].linieGrila = pos.linieGrila;
+          peretiModificati[zidIndex].coloanaGrila = pos.coloanaGrila;
+  
+          ziduriJucator2--;
+          miscareReusita = true;
+      }
+      return miscareReusita;
+  }
+  
+  function miscareAIJucator2() {
+      if (!jucator2AIActiv || jucatorActiv !== 2) {
+          return;
+      }
+  
+      let miscareAIReusita = false;
+  
+      if (ultimaActiuneAI === 'zid') {
+          console.log("AI-ul încearcă să mute pionul.");
+          miscareAIReusita = incercaMiscarePionAI();
+          if (miscareAIReusita) {
+              ultimaActiuneAI = 'pion';
+          } else {
+              console.log("Mișcarea pionului AI nu a fost posibilă. Încearcă să plaseze un zid.");
+              miscareAIReusita = incercaPlasareZidAI();
+              if (miscareAIReusita) {
+                  ultimaActiuneAI = 'zid';
+              }
+          }
+      } else {
+          console.log("AI-ul încearcă să plaseze un zid.");
+          miscareAIReusita = incercaPlasareZidAI();
+          if (miscareAIReusita) {
+              ultimaActiuneAI = 'zid';
+          } else {
+              console.log("Plasarea zidului AI nu a fost posibilă. Încearcă să mute pionul.");
+              miscareAIReusita = incercaMiscarePionAI();
+              if (miscareAIReusita) {
+                  ultimaActiuneAI = 'pion';
+              }
+          }
+      }
+  
+      if (miscareAIReusita) {
+          console.log("AI-ul a efectuat o mișcare. Schimbă rândul.");
+          schimbaRandul();
+      } else {
+          console.log("AI-ul nu a putut face o mișcare validă. Rândul rămâne la AI.");
+          schimbaRandul();
+      }
+  }
